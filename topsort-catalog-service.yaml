@@ -1,0 +1,294 @@
+openapi: 3.0.1
+info:
+  title: Topsort Reference Catalog API
+  contact:
+    email: ralonso@topsort.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+ 
+servers:
+  - url: https://topsort.{your.domain}/
+tags:
+  - name: Catalog API
+    description: Integration for Marketplaces' catalog queries.
+
+security:
+  - BearerAuth: []
+ 
+paths:
+  /products/:
+    post:
+      tags:
+        - Catalog API
+      summary: Retrieves an array of matching products by IDs.
+      operationId: getProductsByID
+      requestBody:
+        description: An array of product IDs.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetProductsByIDRequest'
+        required: true
+      responses:
+        200:
+          description: Returns the products' details, if available.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetProductsResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /products/search/:
+    get:
+      tags:
+        - Catalog API
+      summary: Retrieves an array of matching products by search string.
+      operationId: getProductsBySearchString
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+          example: cerveza delirium tremens
+          description: The search string provided by the user. When a blank string is provided, the string should match all products (e.g. all products with a given category ID).
+          required: true
+        - in: query
+          name: categoryID
+          schema:
+            type: string
+          example: ahEDqV5uhjj8
+          description: Only retrieve products whose category matches the provided ID.
+        - in: query
+          name: prev
+          schema:
+            type: string
+          example: wJLZ4TCNZtEW
+          description: The last product ID on the previous page, relative to the requested page. When provided, will get the products (ordered by search relevance) which come after this product.
+        - in: query
+          name: next
+          schema:
+            type: string
+          description: The first product ID on the next page, relative to the requested page. When provided, will get the products (ordered by search relevance) which come before this product.
+      responses:
+        200:
+          description: Returns products' details for the provided search terms, if available.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetProductsResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          description: No products found.
+
+  /categories/:
+    get:
+      tags:
+        - Catalog API
+      summary: Retrieves an array with all categories, separated in pages.
+      operationId: getCategories
+      parameters:
+        - in: query
+          name: prev
+          schema:
+            type: string
+          description: The last category ID on the previous page, relative to the requested page. When provided, will get the categories (ordered alphabetically) which come after this category.
+        - in: query
+          name: next
+          schema:
+            type: string
+          description: The first category ID on the next page, relative to the requested page. When provided, will get the categories (ordered alphabetically) which come before this category.
+      responses:
+        200:
+          description: Returns a complete list of categories, separated in pages.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetCategoriesResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          description: No categories found.
+
+  /vendors/:
+    get:
+      tags:
+        - Catalog API
+      summary: Retrieves an array with all vendors, separated in pages.
+      operationId: getVendors
+      parameters:
+        - in: query
+          name: prev
+          schema:
+            type: string
+          description: The last vendor ID on the previous page, relative to the requested page. When provided, will get the vendors (ordered alphabetically) which come after this vendor.
+        - in: query
+          name: next
+          schema:
+            type: string
+          description: The first vendor ID on the next page, relative to the requested page. When provided, will get the vendors (ordered alphabetically) which come before this vendor.
+      responses:
+        200:
+          description: Returns a complete list of vendors, separated in pages.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetVendorsResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          description: No vendors found.
+
+components:
+  responses:
+    UnauthorizedError:
+      description: Credentials are missing or invalid.
+
+  schemas:
+    GetProductsByIDRequest:
+      type: array
+      items:
+        type: string
+      minItems: 1
+      maxItems: 51
+      example:
+        - eyGqR4YQgBJa
+        - KHqzavLNS25n
+        - wJLZ4TCNZtEW
+
+    GetProductsResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            description: The product ID.
+            type: string
+            example: eyGqR4YQgBJa
+            readOnly: true
+          name:
+            description: The product name.
+            type: string
+            example: Cerveza Delirium Tremens Botella 330cc x6
+          description:
+            description: The product description.
+            type: string
+            example: Nombrada «Mejor cerveza del mundo» en 1998 en el Certamen Mundial de Cerveza de Chicago, Illinois, Estados Unidos, es una cerveza que seguro te encantará.
+          vendorID:
+            description: The vendor ID.
+            type: string
+            example: 9SiwYqqL8vdG
+          vendorName:
+            description: The vendor name.
+            type: string
+            example: Huyghe Brewery
+          stock:
+            description: The product price in the minimum currency unit (e.g. cents if applicable).
+            type: number
+            minimum: 0
+            example: 126
+          price:
+            description: The product price in the minimum currency unit (e.g. cents if applicable).
+            type: number
+            minimum: 1
+            example: 14900
+          imageURL:
+            description: The product image URL. Its size should be between 250x250 and 600x600 pixels. 
+            type: string
+            format: uri
+            example: https://r.btcdn.co/r/eyJzaG9wX2lkIjozMzU4LCJnIjoiMjYweCJ9/1759e16e6314a24/669830-Cerveza_Delirium_Tremens_Botella_330cc_x6.png
+          brandID:
+            description: The brand id.
+            type: string
+            example: N8G6bGjS1YfF
+          brandName:
+            description: The brand name.
+            type: string
+            example: Delirium Tremens
+          categoryID:
+            description: The category id.
+            type: string
+            example: ahEDqV5uhjj8
+          categoryName:
+            description: The category name.
+            type: string
+            example: Cervezas/Oscuras/Triple Ale
+        required:
+          - id
+      minItems: 1
+      maxItems: 51
+
+    GetCategoriesResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            description: The category ID. If there is no ID for categories in the marketplace, this can be the category name as long as it is unique.
+            type: string
+            example: ahEDqV5uhjj8
+          name:
+            description: The category name.
+            type: string
+            example: Cervezas/Oscuras/Triple Ale
+        required:
+          - id
+          - name
+      minItems: 1
+      maxItems: 51
+      example:
+        - id: ahEDqV5uhjj8
+          name: Cervezas/Ales/Triple Ale
+        - id: cJfoUUzG6GOy
+          name: Cervezas/Ales/Amber
+        - id: oTcnv0fJCRiL
+          name: Cervezas/Lagers/Bocks
+        - id: JspphvZBzV09
+          name: Cervezas/Lagers/Rubias
+
+    GetVendorsResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            description: The vendor ID.
+            type: string
+            example: 9SiwYqqL8vdG
+          name:
+            description: The vendor name.
+            type: string
+            example: Huyghe Brewery
+          logoURL:
+            description: The vendor logo. Its size should ideally be between 100x100 and 600x600 pixels. 
+            type: string
+            format: uri
+            example: https://r.btcdn.co/r/eyJzaG9wX2lkIjozMzU4LCJnIjoiMjYweCJ9/1759e16e6314a24/669830-Cerveza_Delirium_Tremens_Botella_330cc_x6.png
+        required:
+          - id
+          - name
+      minItems: 1
+      maxItems: 51
+      example:
+        - id: C0n7J6j0WySR
+          name: Cervecera Cuello Negro SpA
+          logoURL: https://www.cuellonegro.cl/wp-content/uploads/2017/05/logo_web.png
+        - id: y7v6kSGGUUFn
+          name: Cerveceria Chile SA
+        - id: vhvg6ioBj5fk
+          name: Cerveceria Coda
+        - id: IMwMGVfSsEpQ
+          name: Cerveceria Kunstmann Limitada
+        - id: zo8UXchnFWZu
+          name: Cervecerias Unidas SA
+        - id: 9SiwYqqL8vdG
+          name: Huyghe Brewery
+          logoURL: https://media-exp1.licdn.com/dms/image/C4E0BAQFE4e-wq7TlCw/company-logo_200_200/0/1519861983671?e=2159024400&v=beta&t=ZoishDxg4-kKH9fJBXRkBc_N0adqUpBmGqdB1TM5sYg
+
+  securitySchemes:
+      BearerAuth:
+        type: http
+        scheme: bearer

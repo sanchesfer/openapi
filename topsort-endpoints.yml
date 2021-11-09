@@ -1,0 +1,399 @@
+openapi: 3.0.1
+info:
+  title: Topsort
+  contact:
+    email: wicha@topsort.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+
+servers:
+- url: https://<marketplace>.topsort.com/v1
+tags:
+- name: Auctions
+  description: An auction determines which products should be promoted based on the vendors' bids
+- name: Events
+  description: Significant consumer interactions on the e-commerce site.
+- name: Users
+  description: User access to the Topsort app for managing a vendor's campaigns
+
+security:
+  - BearerAuth: []
+
+paths:
+  /auctions:
+    post:
+      tags:
+      - Auctions
+      summary: Creates a new auction
+      operationId: createAuction
+      requestBody:
+        description: Parameters for how to run the auction and which products should participate.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuctionRequest'
+        required: true
+      responses:
+        201:
+          description: "The auction results. The list of Winner objects will contain at most slots entries.
+          It may contain fewer or no entries at all if there aren't enough products with usable bids.
+          Bid become unusable if campaign budget is exhausted, the bid is disqualified to preserve spend pacing, etc."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Auction'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        
+  /auctions/{auctionId}:
+    get:
+      tags:
+      - Auctions
+      summary: Find Auction by ID
+      description: Returns an earlier auction result.
+      operationId: getAuctionById
+      parameters:
+      - name: auctionId
+        in: path
+        description: An auction ID.
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Returns the auction object with the specified ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Auction'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          description: Auction not found
+    
+  /events:
+    post:
+      tags:
+      - Events
+      summary: Report an event
+      operationId: reportEvent
+      requestBody:
+        description: A significant consumer interaction on the e-commerce site.
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/ClickEvent'
+                - $ref: '#/components/schemas/ImpressionEvent'
+                - $ref: '#/components/schemas/PurchaseEvent'
+              discriminator:
+                propertyName: eventType
+                mapping:
+                  Click: '#/components/schemas/ClickEvent'
+                  Impression: '#/components/schemas/ImpressionEvent'
+                  Purchase: '#/components/schemas/PurchaseEvent'
+        required: true
+      responses:
+        200:
+          description: "An object containing the markeplace ID for the event and the Topsort ID for the same event. 
+          Logging this can facillitate debugging. 
+          The field name for the TopsortID will be \"impressionID\", \"clickId\" or \"purchaseId\" depending on the event in the request."
+          content:
+            application/json:
+              schema:
+                type: object 
+                properties:
+                  id: 
+                    type: string 
+                    example: 234f678-f90c
+                  clickId: 
+                    type: string 
+                    example: c_k37sdm
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /tokens: 
+    post: 
+      tags:
+      - Users
+      summary: Creates an access token for the Topsort app
+      operationId: createToken
+      requestBody:
+        description: "Creates a token that must be included in the authorization header requests
+         to render the Topsort app either directly in a new tab or window, or in an iframe."
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/TokenRequest'
+        required: true
+      responses:
+        201:
+          description: Token was created and will be valid until the expiration specified in the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+  
+components:
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+
+  schemas:
+    AuctionRequest:
+      required:
+      - products
+      type: object
+      properties:
+        slots:
+          type: integer
+          description: The number of winners to return.
+          minimum: 0
+          default: 1
+          example: 1
+        products: 
+          type: array
+          description: An array of objects, each describing a product that should participate in the auction.
+          items: 
+            $ref: '#/components/schemas/Product'
+        session:
+          $ref: '#/components/schemas/Session'
+      
+    Auction:
+      type: object
+      properties:
+        auctionId: 
+          type: string 
+          description: Topsort assigned ID for auction. Should be used in reporting impressions, clicks and purchases.
+          example: AKFU78
+        winners: 
+          type: array 
+          items:
+            $ref: '#/components/schemas/Winner'
+          description: "Array of winner objects in order from highest to lowest bid. 
+          May be empty if there were no qualifying bids."
+
+    Winner: 
+      type: object 
+      required:
+        - rank
+        - productId
+      properties:
+        rank:
+          type: integer
+          description: "Where the product's bid ranked in the auction.
+          Zero-based, so the product with rank 0 won the auction and had the highest bid. 
+          In an auction response, the winners array is sorted so rank will match the entry's index"
+          minimum: 0
+        productId: 
+          type: string 
+          description: The marketplace's ID for the product. It will match the ID for a product in the request's product array.
+          example: pSA0238
+    Product: 
+      required:
+        - productId
+      type: object 
+      properties: 
+        productId:
+          type: integer
+          format: string 
+          example: p_SA0238
+        quality:
+          type: number
+          minimum: 0
+          maximum: 1
+          example: 0.75
+          format: float
+      xml:
+        name: Product
+
+    Session:
+      description: Identifiers describing the consumer's session on the e-commerce site.
+      required:
+        - sessionId
+      type: object 
+      properties:
+        sessionId: 
+          type: string 
+          example: 345bx7
+        consumerId:
+          type: string 
+          example: cid_67bf
+        orderIntentId:
+          type: string 
+
+    Event:
+      type: object 
+      required:
+        - eventType
+        - session
+      properties:
+        eventType: 
+          type: string 
+          description: Discriminator for the type of event.
+        session:
+          $ref: '#/components/schemas/Session'
+        id:
+          type: string 
+          description: "The marketplace's ID for the event. 
+          If present, it should be unique. 
+          Topsort may use this field to de-duplicate events. 
+          Also useful for correlating marketplace and Topsort events."
+
+    Placement: 
+      type: object
+      properties:
+        page: 
+          type: string 
+          description: A marketplace assigned name for a page.
+          example: search_results
+        location:
+          type: string 
+          description: A marketplace defined name for a page part.
+          example: position_1
+
+    ClickEvent:
+      allOf:
+        - $ref: '#/components/schemas/Event'
+        - type: object 
+          required:
+            - placement 
+            - productId
+          properties:
+            placement:
+              $ref: '#/components/schemas/Placement'
+            productId:
+              type: string
+              description: The product that was clicked.
+              example: p_SA0238
+            auctionId:
+              type: string 
+              description: Required for promoted products. Must be the ID for the auction the product won.
+              example: AKFU78
+            id:
+              type: string 
+              description: The marketplace's ID for the click.
+              example: 234f678-f90c
+    
+    ImpressionEvent:
+      allOf:
+        - $ref: '#/components/schemas/Event'
+        - type: object 
+          required:
+            - impressions 
+          properties:
+            impression:
+              type: array 
+              items: 
+                $ref: '#/components/schemas/Impression'
+              minItems: 1
+    
+    Impression:
+      type: object 
+      required:
+        - placement
+        - productId
+      properties:
+        placement:
+          $ref: '#/components/schemas/Placement'
+        productId:
+          type: string
+          description: The product that was rendered.
+          example: p_SA0238
+        auctionId:
+          type: string 
+          description: Required for promoted products. Must be the ID for the auction the product won.
+          example: AKFU78
+        id:
+          type: string 
+          description: The marketplace's ID for the impression.
+          example: 234f678-f90c
+
+    PurchaseEvent:
+      allOf:
+        - $ref: '#/components/schemas/Event'
+        - type: object 
+          required:
+            - id 
+            - purchasedAt
+            - currency
+            - items
+          properties:
+            id:
+              type: string 
+              description: The marketplace assigned ID for the order.
+              example: o:567-123
+            purchasedAt:
+              type: string 
+              description: A time specified in ISO 8601 format. See also RFC 3339
+              example: '2020-12-25T23:59:00+05'
+              format: date-time
+            currency:
+              type: string 
+              description: The 3 character ISO 4270 alphabetic currency code.
+              example: USD
+            items:
+              type: array 
+              description: Items purchased.
+              items: 
+                $ref: '#/components/schemas/PurchaseItem'
+    
+    PurchaseItem:
+      type: object 
+      required:
+        - productId
+        - unitPrice
+      properties:
+        productId:
+          type: string 
+          description: The product being purchased.
+          example: p_SA0238
+        auctionId:
+          type: string 
+          description: If known, the product's auction ID if the consumer clicked on a promoted link before purchasing.
+          example: AKFU78
+        quantity:
+          type: integer
+          minimum: 1
+          default: 1
+          description: Count of product purchased.
+          example: 2
+        unitPrice: 
+          type: integer
+          minimum: 1
+          description: The price of a single item in minor currency units. For example, in the US (currency code "USD") the unit price is specified in cents.
+          example: 1295
+
+    TokenRequest:
+      type: object 
+      required:
+        - expiration
+        - vendorId
+        - userId 
+      properties:
+        expiration:
+          type: string 
+          description: The expiration time for the token in ISO 8601 format.
+        vendorId:
+          type: string 
+          description: A marketplace assigned ID identifying a vendor.
+        userId: 
+          type: string 
+          description: A marketplace assigned ID identifying the user logged into the vendor portal.
+    Token:
+      type: object 
+      required:
+        - token
+      properties:
+        token:
+          type: string 
+          example: cGxlLmNvbS9p.c19yb290Ijp0cnVlfQ
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
