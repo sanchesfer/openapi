@@ -103,6 +103,7 @@ components:
         products:
           type: array
           description: An array of objects, each describing a product that should participate in the auction.
+          minItems: 1
           items:
             $ref: '#/components/schemas/Product'
         session:
@@ -242,6 +243,7 @@ components:
           properties:
             impression:
               type: array
+              minItems: 1
               items:
                 $ref: '#/components/schemas/Impression'
               minItems: 1
@@ -293,6 +295,7 @@ components:
             items:
               type: array
               description: Items purchased.
+              minItems: 1
               items:
                 $ref: '#/components/schemas/PurchaseItem'
 
@@ -333,6 +336,38 @@ components:
           type: integer
           example: 2
           minimum: 1
+
+    # Error Codes
+
+    TopsortError:
+      type: object
+      required:
+        - errCode
+      properties:
+        errCode:
+          type: string
+          enum:
+            - bad_request
+            - internal_server_error
+            - invalid_api_key
+            - invalid_auction_id
+            - invalid_event_type
+            - invalid_promotion_type
+            - invalid_session
+            - missing_placement
+            - missing_product_id
+            - missing_promotion_type
+            - missing_purchased_at
+            - missing_session
+            - missing_slots
+            - no_products
+            - no_purchase_items
+            - too_few_impressions
+            - too_few_slots
+        docUrl:
+          const: "https://topsort.redoc.ly"
+        message:
+          type: string
 
   securitySchemes:
     BearerAuth:
