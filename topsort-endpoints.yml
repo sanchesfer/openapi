@@ -9,7 +9,7 @@ info:
   version: 1.0.0
 
 servers:
-- url: https://<marketplace>.topsort.com/v1
+- url: https://api.topsort.com/v1
 tags:
 - name: Auctions
   description: An auction determines which products should be promoted based on the vendors' bids
