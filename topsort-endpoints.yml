@@ -255,7 +255,6 @@ components:
               minItems: 1
               items:
                 $ref: '#/components/schemas/Impression'
-              minItems: 1
 
     Impression:
       type: object
