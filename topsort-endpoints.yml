@@ -36,15 +36,15 @@ paths:
       responses:
         201:
           description: "The auction results. The list of Winner objects will contain at most slots entries.
-          It may contain fewer or no entries at all if there aren't enough products with usable bids.
-          Bid become unusable if campaign budget is exhausted, the bid is disqualified to preserve spend pacing, etc."
+                        It may contain fewer or no entries at all if there aren't enough products with usable bids.
+                        Bid become unusable if campaign budget is exhausted, the bid is disqualified to preserve spend pacing, etc."
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Auction'
         401:
           $ref: '#/components/responses/UnauthorizedError'
-          
+
   /events:
     post:
       tags:
@@ -69,23 +69,24 @@ paths:
         required: true
       responses:
         200:
-          description: "An object containing the markeplace ID for the event and the Topsort ID for the same event. 
-          Logging this can facillitate debugging. 
-          The field name for the TopsortID will be \"impressionID\", \"clickId\" or \"purchaseId\" depending on the event in the request."
+          description: "An object containing the markeplace ID for the event and the Topsort ID for the same event.
+                        Logging this can facillitate debugging.
+                        The field name for the TopsortID will be \"impressionID\", \"clickId\" or \"purchaseId\"
+                        depending on the event in the request."
           content:
             application/json:
               schema:
-                type: object 
+                type: object
                 properties:
-                  id: 
-                    type: string 
+                  id:
+                    type: string
                     example: 234f678-f90c
-                  clickId: 
-                    type: string 
+                  clickId:
+                    type: string
                     example: c_k37sdm
         401:
           $ref: '#/components/responses/UnauthorizedError'
-  
+
 components:
   responses:
     UnauthorizedError:
@@ -98,35 +99,31 @@ components:
       type: object
       properties:
         slots:
-          type: integer
-          description: The number of winners to return.
-          minimum: 0
-          default: 1
-          example: 1
-        products: 
+          $ref: '#/components/schemas/Slots'
+        products:
           type: array
           description: An array of objects, each describing a product that should participate in the auction.
-          items: 
+          items:
             $ref: '#/components/schemas/Product'
         session:
           $ref: '#/components/schemas/Session'
-      
+
     Auction:
       type: object
       properties:
-        auctionId: 
-          type: string 
+        auctionId:
+          type: string
           description: Topsort assigned ID for auction. Should be used in reporting impressions, clicks and purchases.
           example: AKFU78
-        winners: 
-          type: array 
+        winners:
+          type: array
           items:
             $ref: '#/components/schemas/Winner'
-          description: "Array of winner objects in order from highest to lowest bid. 
-          May be empty if there were no qualifying bids."
+          description: "Array of winner objects in order from highest to lowest bid.
+                        May be empty if there were no qualifying bids."
 
-    Winner: 
-      type: object 
+    Winner:
+      type: object
       required:
         - rank
         - productId
@@ -134,21 +131,22 @@ components:
         rank:
           type: integer
           description: "Where the product's bid ranked in the auction.
-          Zero-based, so the product with rank 0 won the auction and had the highest bid. 
-          In an auction response, the winners array is sorted so rank will match the entry's index"
+                        Zero-based, so the product with rank 0 won the auction and had the highest bid.
+                        In an auction response, the winners array is sorted so rank will match the entry's index"
           minimum: 0
-        productId: 
-          type: string 
+        productId:
+          type: string
           description: The marketplace's ID for the product. It will match the ID for a product in the request's product array.
           example: pSA0238
-    Product: 
+
+    Product:
       required:
         - productId
-      type: object 
-      properties: 
+      type: object
+      properties:
         productId:
           type: integer
-          format: string 
+          format: string
           example: p_SA0238
         quality:
           type: number
@@ -163,53 +161,61 @@ components:
       description: Identifiers describing the consumer's session on the e-commerce site.
       required:
         - sessionId
-      type: object 
+      type: object
       properties:
-        sessionId: 
-          type: string 
+        sessionId:
+          type: string
           example: 345bx7
         consumerId:
-          type: string 
+          type: string
           example: cid_67bf
         orderIntentId:
-          type: string 
+          description: "Marketplace assigned ID for a shopping cart."
+          type: string
+          example: cart_6677
+        orderId:
+          description: "Marketplace assigned ID for an order."
+          type: string
+          example: order_ff5b
 
     Event:
-      type: object 
+      type: object
       required:
         - eventType
         - session
       properties:
-        eventType: 
-          type: string 
+        eventType:
+          type: string
           description: Discriminator for the type of event.
         session:
           $ref: '#/components/schemas/Session'
         id:
-          type: string 
-          description: "The marketplace's ID for the event. 
-          If present, it should be unique. 
-          Topsort may use this field to de-duplicate events. 
-          Also useful for correlating marketplace and Topsort events."
+          type: string
+          description: "The marketplace's ID for the event.
+                        If present, it should be unique.
+                        Topsort may use this field to de-duplicate events.
+                        Also useful for correlating marketplace and Topsort events."
 
-    Placement: 
+    Placement:
       type: object
+      required:
+        - page
       properties:
-        page: 
-          type: string 
+        page:
+          type: string
           description: A marketplace assigned name for a page.
           example: search_results
         location:
-          type: string 
+          type: string
           description: A marketplace defined name for a page part.
           example: position_1
 
     ClickEvent:
       allOf:
         - $ref: '#/components/schemas/Event'
-        - type: object 
+        - type: object
           required:
-            - placement 
+            - placement
             - productId
           properties:
             placement:
@@ -219,29 +225,29 @@ components:
               description: The product that was clicked.
               example: p_SA0238
             auctionId:
-              type: string 
+              type: string
               description: Required for promoted products. Must be the ID for the auction the product won.
               example: AKFU78
             id:
-              type: string 
+              type: string
               description: The marketplace's ID for the click.
               example: 234f678-f90c
-    
+
     ImpressionEvent:
       allOf:
         - $ref: '#/components/schemas/Event'
-        - type: object 
+        - type: object
           required:
-            - impressions 
+            - impressions
           properties:
             impression:
-              type: array 
-              items: 
+              type: array
+              items:
                 $ref: '#/components/schemas/Impression'
               minItems: 1
-    
+
     Impression:
-      type: object 
+      type: object
       required:
         - placement
         - productId
@@ -253,55 +259,55 @@ components:
           description: The product that was rendered.
           example: p_SA0238
         auctionId:
-          type: string 
+          type: string
           description: Required for promoted products. Must be the ID for the auction the product won.
           example: AKFU78
         id:
-          type: string 
+          type: string
           description: The marketplace's ID for the impression.
           example: 234f678-f90c
 
     PurchaseEvent:
       allOf:
         - $ref: '#/components/schemas/Event'
-        - type: object 
+        - type: object
           required:
-            - id 
+            - id
             - purchasedAt
             - currency
             - items
           properties:
             id:
-              type: string 
+              type: string
               description: The marketplace assigned ID for the order.
               example: o:567-123
             purchasedAt:
-              type: string 
+              type: string
               description: A time specified in ISO 8601 format. See also RFC 3339
               example: '2020-12-25T23:59:00+05'
               format: date-time
             currency:
-              type: string 
+              type: string
               description: The 3 character ISO 4270 alphabetic currency code.
               example: USD
             items:
-              type: array 
+              type: array
               description: Items purchased.
-              items: 
+              items:
                 $ref: '#/components/schemas/PurchaseItem'
-    
+
     PurchaseItem:
-      type: object 
+      type: object
       required:
         - productId
         - unitPrice
       properties:
         productId:
-          type: string 
+          type: string
           description: The product being purchased.
           example: p_SA0238
         auctionId:
-          type: string 
+          type: string
           description: If known, the product's auction ID if the consumer clicked on a promoted link before purchasing.
           example: AKFU78
         quantity:
@@ -310,11 +316,23 @@ components:
           default: 1
           description: Count of product purchased.
           example: 2
-        unitPrice: 
+        unitPrice:
           type: integer
           minimum: 1
           description: The price of a single item in minor currency units. For example, in the US (currency code "USD") the unit price is specified in cents.
           example: 1295
+
+    Slots:
+      description: "The Slots object specifies how many auctions winners should be
+                    returned for each promotion type. The promotion types depend on
+                    the marketplace configuration. \"listings\", \"videoAds\" and
+                    \"bannerAds\" are common."
+      type: object
+      properties:
+        listings:
+          type: integer
+          example: 2
+          minimum: 1
 
   securitySchemes:
     BearerAuth:
