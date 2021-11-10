@@ -44,6 +44,8 @@ paths:
                 $ref: '#/components/schemas/Auction'
         401:
           $ref: '#/components/responses/UnauthorizedError'
+        400:
+          $ref: '#/components/responses/BadRequest'
 
   /events:
     post:
@@ -86,11 +88,18 @@ paths:
                     example: c_k37sdm
         401:
           $ref: '#/components/responses/UnauthorizedError'
+        400:
+          $ref: '#/components/responses/BadRequest'
 
 components:
   responses:
     UnauthorizedError:
       description: Access token is missing or invalid
+    BadRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TopsortError'
 
   schemas:
     AuctionRequest:
