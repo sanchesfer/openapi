@@ -10,6 +10,7 @@ info:
 
 servers:
 - url: https://api.topsort.com/v1
+- url: https://demo.api.topsort.com/v1
 tags:
 - name: Auctions
   description: An auction determines which products should be promoted based on the vendors' bids
