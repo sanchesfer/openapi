@@ -44,33 +44,7 @@ paths:
                 $ref: '#/components/schemas/Auction'
         401:
           $ref: '#/components/responses/UnauthorizedError'
-        
-  /auctions/{auctionId}:
-    get:
-      tags:
-      - Auctions
-      summary: Find Auction by ID
-      description: Returns an earlier auction result.
-      operationId: getAuctionById
-      parameters:
-      - name: auctionId
-        in: path
-        description: An auction ID.
-        required: true
-        schema:
-          type: string
-      responses:
-        200:
-          description: Returns the auction object with the specified ID.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Auction'
-        401:
-          $ref: '#/components/responses/UnauthorizedError'
-        404:
-          description: Auction not found
-    
+          
   /events:
     post:
       tags:
