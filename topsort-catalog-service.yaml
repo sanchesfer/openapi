@@ -8,16 +8,20 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: 1.0.0
   description: Integration for Marketplaces' catalog queries
- 
+
 servers:
-  - url: https://topsort.<your.domain>
+  - url: https://{yourDomain}
+  - variables:
+      yourDomain:
+        default: topsort.marketplace.com/api/catalog
+        description: A url that points to your catalog service
 tags:
   - name: Catalog API
     description: Integration for Marketplaces' catalog queries.
 
 security:
   - BearerAuth: []
- 
+
 paths:
   /products:
     post:
@@ -197,7 +201,7 @@ components:
             minimum: 1
             example: 14900
           imageURL:
-            description: The product image URL. Its size should be between 250x250 and 600x600 pixels. 
+            description: The product image URL. Its size should be between 250x250 and 600x600 pixels.
             type: string
             format: uri
             example: https://r.btcdn.co/r/eyJzaG9wX2lkIjozMzU4LCJnIjoiMjYweCJ9/1759e16e6314a24/669830-Cerveza_Delirium_Tremens_Botella_330cc_x6.png
@@ -264,7 +268,7 @@ components:
             type: string
             example: Huyghe Brewery
           logoURL:
-            description: The vendor logo. Its size should ideally be between 100x100 and 600x600 pixels. 
+            description: The vendor logo. Its size should ideally be between 100x100 and 600x600 pixels.
             type: string
             format: uri
             example: https://r.btcdn.co/r/eyJzaG9wX2lkIjozMzU4LCJnIjoiMjYweCJ9/1759e16e6314a24/669830-Cerveza_Delirium_Tremens_Botella_330cc_x6.png
