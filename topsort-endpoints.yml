@@ -96,6 +96,7 @@ components:
     UnauthorizedError:
       description: Access token is missing or invalid
     BadRequest:
+      description: HTTP status codes as registered with IANA.
       content:
         application/json:
           schema:
@@ -373,7 +374,7 @@ components:
             - too_few_impressions
             - too_few_slots
         docUrl:
-          const: "https://topsort.redoc.ly"
+          enum: ["https://topsort.redoc.ly"]
         message:
           type: string
 
