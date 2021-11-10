@@ -11,7 +11,7 @@ info:
 
 servers:
   - url: https://{yourDomain}
-  - variables:
+    variables:
       yourDomain:
         default: topsort.marketplace.com/api/catalog
         description: A url that points to your catalog service
