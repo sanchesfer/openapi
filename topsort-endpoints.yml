@@ -160,7 +160,7 @@ components:
       type: object
       properties:
         productId:
-          type: integer
+          type: string
           format: string
           example: p_SA0238
         quality:
