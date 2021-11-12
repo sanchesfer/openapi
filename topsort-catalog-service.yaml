@@ -13,7 +13,7 @@ servers:
   - url: https://{yourDomain}
     variables:
       yourDomain:
-        default: topsort.marketplace.com/api/catalog
+        default: http://demo.topsort.com/topsort/api
         description: A url that points to your catalog service
 tags:
   - name: Catalog API
@@ -83,7 +83,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetProductsResponse'
+                $ref: '#/components/schemas/PaginatedProductResponse'
         401:
           $ref: '#/components/responses/UnauthorizedError'
         404:
@@ -226,72 +226,109 @@ components:
       minItems: 1
       maxItems: 51
 
-    GetCategoriesResponse:
-      type: array
-      items:
-        type: object
-        properties:
-          id:
-            description: The category ID. If there is no ID for categories in the marketplace, this can be the category name as long as it is unique.
-            type: string
-            example: ahEDqV5uhjj8
-          name:
-            description: The category name.
-            type: string
-            example: Cervezas/Oscuras/Triple Ale
+    PaginatedResponse:
+      type: object
+      properties:
+        next:
+          description: Token to be passed in the next call to this request to receive the next page
+          type: string
+          example: asTpl1k746
+        prev:
+          description: Token to be passed in the next call to this request to receive the previous page
+          type: string
+          example: yIhohZwFbx
+
+    PaginatedProductResponse:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
         required:
-          - id
-          - name
-      minItems: 1
-      maxItems: 51
-      example:
-        - id: ahEDqV5uhjj8
-          name: Cervezas/Ales/Triple Ale
-        - id: cJfoUUzG6GOy
-          name: Cervezas/Ales/Amber
-        - id: oTcnv0fJCRiL
-          name: Cervezas/Lagers/Bocks
-        - id: JspphvZBzV09
-          name: Cervezas/Lagers/Rubias
+        - response
+        properties:
+          response:
+            $ref: '#/components/schemas/GetProductsResponse'
+
+    
+    GetCategoriesResponse:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        required:
+        - response
+        properties:
+          response:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  description: The category ID. If there is no ID for categories in the marketplace, this can be the category name as long as it is unique.
+                  type: string
+                  example: ahEDqV5uhjj8
+                name:
+                  description: The category name.
+                  type: string
+                  example: Cervezas/Oscuras/Triple Ale
+              required:
+                - id
+                - name
+            minItems: 1
+            maxItems: 51
+            example:
+              - id: ahEDqV5uhjj8
+                name: Cervezas/Ales/Triple Ale
+              - id: cJfoUUzG6GOy
+                name: Cervezas/Ales/Amber
+              - id: oTcnv0fJCRiL
+                name: Cervezas/Lagers/Bocks
+              - id: JspphvZBzV09
+                name: Cervezas/Lagers/Rubias
 
     GetVendorsResponse:
-      type: array
-      items:
-        type: object
-        properties:
-          id:
-            description: The vendor ID.
-            type: string
-            example: 9SiwYqqL8vdG
-          name:
-            description: The vendor name.
-            type: string
-            example: Huyghe Brewery
-          logoURL:
-            description: The vendor logo. Its size should ideally be between 100x100 and 600x600 pixels.
-            type: string
-            format: uri
-            example: https://r.btcdn.co/r/eyJzaG9wX2lkIjozMzU4LCJnIjoiMjYweCJ9/1759e16e6314a24/669830-Cerveza_Delirium_Tremens_Botella_330cc_x6.png
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
         required:
-          - id
-          - name
-      minItems: 1
-      maxItems: 51
-      example:
-        - id: C0n7J6j0WySR
-          name: Cervecera Cuello Negro SpA
-          logoURL: https://www.cuellonegro.cl/wp-content/uploads/2017/05/logo_web.png
-        - id: y7v6kSGGUUFn
-          name: Cerveceria Chile SA
-        - id: vhvg6ioBj5fk
-          name: Cerveceria Coda
-        - id: IMwMGVfSsEpQ
-          name: Cerveceria Kunstmann Limitada
-        - id: zo8UXchnFWZu
-          name: Cervecerias Unidas SA
-        - id: 9SiwYqqL8vdG
-          name: Huyghe Brewery
-          logoURL: https://media-exp1.licdn.com/dms/image/C4E0BAQFE4e-wq7TlCw/company-logo_200_200/0/1519861983671?e=2159024400&v=beta&t=ZoishDxg4-kKH9fJBXRkBc_N0adqUpBmGqdB1TM5sYg
+        - response
+        properties:
+          response:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  description: The vendor ID.
+                  type: string
+                  example: 9SiwYqqL8vdG
+                name:
+                  description: The vendor name.
+                  type: string
+                  example: Huyghe Brewery
+                logoURL:
+                  description: The vendor logo. Its size should ideally be between 100x100 and 600x600 pixels.
+                  type: string
+                  format: uri
+                  example: https://r.btcdn.co/r/eyJzaG9wX2lkIjozMzU4LCJnIjoiMjYweCJ9/1759e16e6314a24/669830-Cerveza_Delirium_Tremens_Botella_330cc_x6.png
+              required:
+                - id
+                - name
+            minItems: 1
+            maxItems: 51
+            example:
+              - id: C0n7J6j0WySR
+                name: Cervecera Cuello Negro SpA
+                logoURL: https://www.cuellonegro.cl/wp-content/uploads/2017/05/logo_web.png
+              - id: y7v6kSGGUUFn
+                name: Cerveceria Chile SA
+              - id: vhvg6ioBj5fk
+                name: Cerveceria Coda
+              - id: IMwMGVfSsEpQ
+                name: Cerveceria Kunstmann Limitada
+              - id: zo8UXchnFWZu
+                name: Cervecerias Unidas SA
+              - id: 9SiwYqqL8vdG
+                name: Huyghe Brewery
+                logoURL: https://media-exp1.licdn.com/dms/image/C4E0BAQFE4e-wq7TlCw/company-logo_200_200/0/1519861983671?e=2159024400&v=beta&t=ZoishDxg4-kKH9fJBXRkBc_N0adqUpBmGqdB1TM5sYg
 
   securitySchemes:
       BearerAuth:
