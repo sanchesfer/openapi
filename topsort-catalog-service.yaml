@@ -13,7 +13,7 @@ servers:
   - url: https://{yourDomain}
     variables:
       yourDomain:
-        default: http://demo.topsort.com/topsort/api
+        default: demo.topsort.com/topsort/api
         description: A url that points to your catalog service
 tags:
   - name: Catalog API
@@ -58,7 +58,9 @@ paths:
           schema:
             type: string
           example: cerveza delirium tremens
-          description: The search string provided by the user. When a blank string is provided, the string should match all products (e.g. all products with a given category ID).
+          description: >
+            The search string provided by the user. When a blank string is provided, 
+            the string should match all products (e.g. all products with a given category ID).
           required: true
         - in: query
           name: categoryID
@@ -71,12 +73,16 @@ paths:
           schema:
             type: string
           example: wJLZ4TCNZtEW
-          description: The last product ID on the previous page, relative to the requested page. When provided, will get the products (ordered by search relevance) which come after this product.
+          description: >
+            The passed string identifying the previous page, relative to the requested page.
+            When provided, will get the products (ordered by search relevance) which come after this product.
         - in: query
           name: next
           schema:
             type: string
-          description: The first product ID on the next page, relative to the requested page. When provided, will get the products (ordered by search relevance) which come before this product.
+          description: >
+            The passed string identifying the next page, relative to the requested page.
+            When provided, will get the products (ordered by search relevance) which come before this product.
       responses:
         200:
           description: Returns products' details for the provided search terms, if available.
@@ -100,12 +106,16 @@ paths:
           name: prev
           schema:
             type: string
-          description: The last category ID on the previous page, relative to the requested page. When provided, will get the categories (ordered alphabetically) which come after this category.
+          description: >
+            The passed string identifying the previous page, relative to the requested page.
+            When provided, will get the products (ordered alphabetically) which come after this product.
         - in: query
           name: next
           schema:
             type: string
-          description: The first category ID on the next page, relative to the requested page. When provided, will get the categories (ordered alphabetically) which come before this category.
+          description: > 
+            The passed string identifying the next page, relative to the requested page.
+            When provided, will get the categories (ordered alphabetically) which come before this category.
       responses:
         200:
           description: Returns a complete list of categories, separated in pages.
@@ -129,12 +139,16 @@ paths:
           name: prev
           schema:
             type: string
-          description: The last vendor ID on the previous page, relative to the requested page. When provided, will get the vendors (ordered alphabetically) which come after this vendor.
+          description: >
+            The passed string identifying the previous page, relative to the requested page.
+            When provided, will get the vendors (ordered alphabetically) which come after this vendor.
         - in: query
           name: next
           schema:
             type: string
-          description: The first vendor ID on the next page, relative to the requested page. When provided, will get the vendors (ordered alphabetically) which come before this vendor.
+          description: >
+            The passed string identifying the next page, relative to the requested page.
+            When provided, will get the vendors (ordered alphabetically) which come before this vendor.
       responses:
         200:
           description: Returns a complete list of vendors, separated in pages.
@@ -181,7 +195,9 @@ components:
           description:
             description: The product description.
             type: string
-            example: Nombrada «Mejor cerveza del mundo» en 1998 en el Certamen Mundial de Cerveza de Chicago, Illinois, Estados Unidos, es una cerveza que seguro te encantará.
+            example: > 
+              Nombrada «Mejor cerveza del mundo» en 1998 en el Certamen Mundial de Cerveza de Chicago, Illinois,
+              Estados Unidos, es una cerveza que seguro te encantará.
           vendorID:
             description: The vendor ID.
             type: string
@@ -262,7 +278,9 @@ components:
               type: object
               properties:
                 id:
-                  description: The category ID. If there is no ID for categories in the marketplace, this can be the category name as long as it is unique.
+                  description: > 
+                    The category ID. If there is no ID for categories in the marketplace, this 
+                    can be the category name as long as it is unique.
                   type: string
                   example: ahEDqV5uhjj8
                 name:
