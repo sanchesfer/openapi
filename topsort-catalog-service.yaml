@@ -282,7 +282,7 @@ components:
               - id: oTcnv0fJCRiL
                 name: Beers/Lagers/Bocks
               - id: JspphvZBzV09
-                name: Beers/Lagers/Rubias
+                name: Beers/Lagers/Blonde
 
     GetVendorsResponse:
       allOf:
