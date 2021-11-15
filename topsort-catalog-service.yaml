@@ -276,7 +276,7 @@ components:
             maxItems: 51
             example:
               - id: ahEDqV5uhjj8
-                name: Beers/Ales/Triple Ale
+                name: Beers/Belgian
               - id: cJfoUUzG6GOy
                 name: Beers/Ales/Amber
               - id: oTcnv0fJCRiL
