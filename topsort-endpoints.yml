@@ -126,16 +126,22 @@ components:
     Auction:
       type: object
       properties:
-        auctionId:
-          type: string
-          description: Topsort assigned ID for auction. Should be used in reporting impressions, clicks and purchases.
-          example: AKFU78
-        winners:
-          type: array
-          items:
-            $ref: '#/components/schemas/Winner'
-          description: "Array of winner objects in order from highest to lowest bid.
-                        May be empty if there were no qualifying bids."
+        slots:
+          type: object
+          properties:
+            listings:
+              type: object
+              properties:
+                auctionId:
+                  type: string
+                  description: Topsort assigned ID for auction. Should be used in reporting impressions, clicks and purchases.
+                  example: AKFU78
+                winners:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Winner'
+                  description: "Array of winner objects in order from highest to lowest bid.
+                                May be empty if there were no qualifying bids."
 
     Winner:
       type: object
