@@ -9,10 +9,10 @@ info:
   version: 1.0.0
 
 servers:
-- url: https://api.topsort.com/v1
-  description: Production server (uses live data)
 - url: https://demo.api.topsort.com/v1
   description: Demo server (uses test data)
+- url: https://api.topsort.com/v1
+  description: Production server (uses live data)
 
 tags:
 - name: Auctions
@@ -261,7 +261,7 @@ components:
           required:
             - impressions
           properties:
-            impression:
+            impressions:
               type: array
               minItems: 1
               items:
@@ -305,7 +305,7 @@ components:
             purchasedAt:
               type: string
               description: A time specified in ISO 8601 format. See also RFC 3339
-              example: '2020-12-25T23:59:00+05'
+              example: '2021-10-12T07:20:50.52Z'
               format: date-time
             currency:
               type: string

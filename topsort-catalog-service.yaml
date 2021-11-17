@@ -75,14 +75,14 @@ paths:
           example: wJLZ4TCNZtEW
           description: >
             The passed string identifying the previous page, relative to the requested page.
-            When provided, will get the products (ordered by search relevance) which come after this product.
+            When provided, will get the products (ordered by search relevance) of that page.
         - in: query
           name: next
           schema:
             type: string
           description: >
             The passed string identifying the next page, relative to the requested page.
-            When provided, will get the products (ordered by search relevance) which come before this product.
+            When provided, will get the products (ordered by search relevance) of that page.
       responses:
         200:
           description: Returns products' details for the provided search terms, if available.
@@ -108,14 +108,14 @@ paths:
             type: string
           description: >
             The passed string identifying the previous page, relative to the requested page.
-            When provided, will get the products (ordered alphabetically) which come after this product.
+            When provided, will get the products (ordered alphabetically) of that page.
         - in: query
           name: next
           schema:
             type: string
           description: > 
             The passed string identifying the next page, relative to the requested page.
-            When provided, will get the categories (ordered alphabetically) which come before this category.
+            When provided, will get the categories (ordered alphabetically) of that page.
       responses:
         200:
           description: Returns a complete list of categories, separated in pages.
