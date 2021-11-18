@@ -191,13 +191,12 @@ components:
           name:
             description: The product name.
             type: string
-            example: Cerveza Delirium Tremens Botella 330cc x6
+            example: Delirium Tremens Beer Bottle 330cc x6
           description:
             description: The product description.
             type: string
-            example: > 
-              Nombrada «Mejor cerveza del mundo» en 1998 en el Certamen Mundial de Cerveza de Chicago, Illinois,
-              Estados Unidos, es una cerveza que seguro te encantará.
+            example: Named as \"Best Beer in the World\" in 2008 at the World Beer Championships in Chicago, Illinois.
+
           vendorID:
             description: The vendor ID.
             type: string
@@ -236,7 +235,7 @@ components:
           categoryName:
             description: The category name.
             type: string
-            example: Cervezas/Oscuras/Triple Ale
+            example: Beers/Belgian
         required:
           - id
       minItems: 1
@@ -286,7 +285,7 @@ components:
                 name:
                   description: The category name.
                   type: string
-                  example: Cervezas/Oscuras/Triple Ale
+                  example: Beers/Belgian
               required:
                 - id
                 - name
@@ -294,13 +293,13 @@ components:
             maxItems: 51
             example:
               - id: ahEDqV5uhjj8
-                name: Cervezas/Ales/Triple Ale
+                name: Beers/Belgian
               - id: cJfoUUzG6GOy
-                name: Cervezas/Ales/Amber
+                name: Beers/Ales/Amber
               - id: oTcnv0fJCRiL
-                name: Cervezas/Lagers/Bocks
+                name: Beers/Lagers/Bocks
               - id: JspphvZBzV09
-                name: Cervezas/Lagers/Rubias
+                name: Beers/Lagers/Blonde
 
     GetVendorsResponse:
       allOf:
