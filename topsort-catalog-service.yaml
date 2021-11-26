@@ -245,11 +245,11 @@ components:
       type: object
       properties:
         next:
-          description: Token to be passed in the next call to this request to receive the next page
+          description: Token to be passed in the next call to this request to receive the next page. It must not contain spaces.
           type: string
           example: asTpl1k746
         prev:
-          description: Token to be passed in the next call to this request to receive the previous page
+          description: Token to be passed in the next call to this request to receive the previous page. It must not contain spaces.
           type: string
           example: yIhohZwFbx
 
