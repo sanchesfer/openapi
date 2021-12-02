@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: Topsort
+  title: Topsort Endpoints API Reference
   contact:
     email: wicha@topsort.com
   license:
