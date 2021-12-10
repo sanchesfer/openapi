@@ -63,6 +63,15 @@ paths:
             the string should match all products (e.g. all products with a given category ID).
           required: true
         - in: query
+          name: vendorID
+          schema:
+            type: string
+          example: "9SiwYqqL8vdG"
+          description: >
+            Vendor unique identifier. This identifier is given by the marketplace and allows this service
+            to match the vendor with the proper products.
+          required: false
+        - in: query
           name: categoryID
           schema:
             type: string
