@@ -23,6 +23,15 @@ security:
   - BearerAuth: []
 
 paths:
+  /:
+    get:
+      operationId: getRootUrl
+      security: [] # No security
+      summary: returns success
+      responses:
+        200:
+          description: Returns the products' details, if available.
+
   /products:
     post:
       tags:
