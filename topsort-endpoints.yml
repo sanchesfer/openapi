@@ -326,10 +326,6 @@ components:
               minItems: 1
               items:
                 $ref: '#/components/schemas/PurchaseItem'
-            occurred_at:
-              type: string
-              description: RFC3339 formatted timestamp including UTC offset
-              example: "2009-01-01T12:59:59-05:00"
 
     PurchaseItem:
       type: object
