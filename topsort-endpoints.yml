@@ -253,6 +253,10 @@ components:
               type: string
               description: The marketplace's ID for the click.
               example: 234f678-f90c
+            occurred_at:
+              type: string
+              description: RFC3339 formatted timestamp including UTC offset
+              example: "2009-01-01T12:59:59-05:00"
 
     ImpressionEvent:
       allOf:
@@ -266,6 +270,11 @@ components:
               minItems: 1
               items:
                 $ref: '#/components/schemas/Impression'
+            occurred_at:
+              type: string
+              description: RFC3339 formatted timestamp including UTC offset
+              example: "2009-01-01T12:59:59-05:00"
+
 
     Impression:
       type: object
