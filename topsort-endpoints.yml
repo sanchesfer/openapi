@@ -58,7 +58,7 @@ paths:
       summary: Report an event
       operationId: reportEvent
       requestBody:
-        description: A significant consumer interaction on the e-commerce site.
+        description: 'Use the `/events` endpoint to notify Topsort about significant consumer interactions on the e-commerce site: impressions -- product links become visible to the consumer; clicks -- the consumer clicks on a product link; and purchases -- the consumer buys some products.'
         content:
           application/json:
             schema:
@@ -76,20 +76,13 @@ paths:
       responses:
         200:
           description: "An object containing the markeplace ID for the event and the Topsort ID for the same event.
-                        Logging this can facillitate debugging.
+                        Logging this can facilitate debugging.
                         The field name for the TopsortID will be \"impressionID\", \"clickId\" or \"purchaseId\"
                         depending on the event in the request."
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    example: 234f678-f90c
-                  clickId:
-                    type: string
-                    example: c_k37sdm
+                $ref: '#/components/schemas/EventResponse'
         401:
           $ref: '#/components/responses/UnauthorizedError'
         400:
@@ -179,7 +172,7 @@ components:
         name: Product
 
     Session:
-      description: Identifiers describing the consumer's session on the e-commerce site.
+      description: The Session object allows correlating user activity during a session whether or not they are actually logged in. For all calls to Topsort, include as many as are known. 
       required:
         - sessionId
       type: object
@@ -207,15 +200,13 @@ components:
       properties:
         eventType:
           type: string
+          enum:
+            - impression
+            - click
+            - purchase
           description: Discriminator for the type of event.
         session:
           $ref: '#/components/schemas/Session'
-        id:
-          type: string
-          description: "The marketplace's ID for the event.
-                        If present, it should be unique.
-                        Topsort may use this field to de-duplicate events.
-                        Also useful for correlating marketplace and Topsort events."
 
     Placement:
       type: object
@@ -232,6 +223,7 @@ components:
           example: position_1
 
     ClickEvent:
+      description: ClickEvents are sent to Topsort when the consumer has clicked on an impression. Topsort charges the vendor and pays the marketplace for clicks on impressions in promoted placements on the e-commerce site.
       allOf:
         - $ref: '#/components/schemas/Event'
         - type: object
@@ -251,14 +243,16 @@ components:
               example: AKFU78
             id:
               type: string
-              description: The marketplace's ID for the click.
+              description: The marketplace's unique ID for the click.
               example: 234f678-f90c
             occurred_at:
               type: string
+              format: date-time
               description: RFC3339 formatted timestamp including UTC offset
               example: "2009-01-01T12:59:59-05:00"
 
     ImpressionEvent:
+      description: A product has become visible to the consumer. In case you cannot send the impression when the product is visible, send us an impression event when the product was rendered in the HTML or if that's also not possible when your API returns the results. It is important to select the most specific event so that your vendors have more accurate CTR metrics, which allow them to better predict their campaigns.
       allOf:
         - $ref: '#/components/schemas/Event'
         - type: object
@@ -272,6 +266,7 @@ components:
                 $ref: '#/components/schemas/Impression'
             occurred_at:
               type: string
+              format: date-time
               description: RFC3339 formatted timestamp including UTC offset
               example: "2009-01-01T12:59:59-05:00"
 
@@ -298,13 +293,13 @@ components:
           example: 234f678-f90c
 
     PurchaseEvent:
+      description: The consumer has purchased some products.
       allOf:
         - $ref: '#/components/schemas/Event'
         - type: object
           required:
             - id
             - purchasedAt
-            - currency
             - items
           properties:
             id:
@@ -313,13 +308,9 @@ components:
               example: o:567-123
             purchasedAt:
               type: string
-              description: A time specified in ISO 8601 format. See also RFC 3339
+              description: RFC3339 formatted timestamp including UTC offset
               example: '2021-10-12T07:20:50.52Z'
               format: date-time
-            currency:
-              type: string
-              description: The 3 character ISO 4270 alphabetic currency code.
-              example: USD
             items:
               type: array
               description: Items purchased.
@@ -335,7 +326,7 @@ components:
       properties:
         productId:
           type: string
-          description: The product being purchased.
+          description: The marketplace ID of the product being purchased.
           example: p_SA0238
         auctionId:
           type: string
@@ -352,6 +343,33 @@ components:
           minimum: 1
           description: The price of a single item in minor currency units. For example, in the US (currency code "USD") the unit price is specified in cents.
           example: 1295
+
+    ImpressionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 234f678-f90c
+        impressionId:
+          type: string
+          example: i_k31xyz
+
+    EventResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 234f678-f90c
+        clickId:
+          type: string
+          example: c_k37sdm
+        impressions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImpressionResponse'
+        purchaseId:
+          type: string
+          example: p_k39abc
 
     Slots:
       description: "The Slots object specifies how many auctions winners should be
