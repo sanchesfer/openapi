@@ -9,16 +9,16 @@ info:
   version: 1.0.0
 
 servers:
-- url: https://demo.api.topsort.com/v1
-  description: Demo server (uses test data)
-- url: https://api.topsort.com/v1
-  description: Production server (uses live data)
+  - url: https://demo.api.topsort.com/v1
+    description: Demo server (uses test data)
+  - url: https://api.topsort.com/v1
+    description: Production server (uses live data)
 
 tags:
-- name: Auctions
-  description: An auction determines which products should be promoted based on the vendors' bids
-- name: Events
-  description: Significant consumer interactions on the e-commerce site.
+  - name: Auctions
+    description: An auction determines which products should be promoted based on the vendors' bids
+  - name: Events
+    description: Significant consumer interactions on the e-commerce site.
 
 security:
   - BearerAuth: []
@@ -27,7 +27,7 @@ paths:
   /auctions:
     post:
       tags:
-      - Auctions
+        - Auctions
       summary: Creates a new auction
       operationId: createAuction
       requestBody:
@@ -39,9 +39,10 @@ paths:
         required: true
       responses:
         201:
-          description: "The auction results. The list of Winner objects will contain at most slots entries.
-                        It may contain fewer or no entries at all if there aren't enough products with usable bids.
-                        Bid become unusable if campaign budget is exhausted, the bid is disqualified to preserve spend pacing, etc."
+          description:
+            "The auction results. The list of Winner objects will contain at most slots entries.
+            It may contain fewer or no entries at all if there aren't enough products with usable bids.
+            Bid become unusable if campaign budget is exhausted, the bid is disqualified to preserve spend pacing, etc."
           content:
             application/json:
               schema:
@@ -54,7 +55,7 @@ paths:
   /events:
     post:
       tags:
-      - Events
+        - Events
       summary: Report an event
       operationId: reportEvent
       requestBody:
@@ -75,10 +76,11 @@ paths:
         required: true
       responses:
         200:
-          description: "An object containing the markeplace ID for the event and the Topsort ID for the same event.
-                        Logging this can facilitate debugging.
-                        The field name for the TopsortID will be \"impressionID\", \"clickId\" or \"purchaseId\"
-                        depending on the event in the request."
+          description:
+            'An object containing the markeplace ID for the event and the Topsort ID for the same event.
+            Logging this can facilitate debugging.
+            The field name for the TopsortID will be "impressionID", "clickId" or "purchaseId"
+            depending on the event in the request.'
           content:
             application/json:
               schema:
@@ -102,7 +104,7 @@ components:
   schemas:
     AuctionRequest:
       required:
-      - products
+        - products
       type: object
       properties:
         slots:
@@ -133,8 +135,9 @@ components:
                   type: array
                   items:
                     $ref: '#/components/schemas/Winner'
-                  description: "Array of winner objects in order from highest to lowest bid.
-                                May be empty if there were no qualifying bids."
+                  description:
+                    'Array of winner objects in order from highest to lowest bid.
+                    May be empty if there were no qualifying bids.'
 
     Winner:
       type: object
@@ -145,8 +148,8 @@ components:
         rank:
           type: integer
           description: "Where the product's bid ranked in the auction.
-                        Zero-based, so the product with rank 0 won the auction and had the highest bid.
-                        In an auction response, the winners array is sorted so rank will match the entry's index"
+            Zero-based, so the product with rank 0 won the auction and had the highest bid.
+            In an auction response, the winners array is sorted so rank will match the entry's index"
           minimum: 0
         productId:
           type: string
@@ -172,7 +175,7 @@ components:
         name: Product
 
     Session:
-      description: The Session object allows correlating user activity during a session whether or not they are actually logged in. For all calls to Topsort, include as many as are known. 
+      description: The Session object allows correlating user activity during a session whether or not they are actually logged in. For all calls to Topsort, include as many as are known.
       required:
         - sessionId
       type: object
@@ -184,11 +187,11 @@ components:
           type: string
           example: cid_67bf
         orderIntentId:
-          description: "Marketplace assigned ID for a shopping cart."
+          description: 'Marketplace assigned ID for a shopping cart.'
           type: string
           example: cart_6677
         orderId:
-          description: "Marketplace assigned ID for an order."
+          description: 'Marketplace assigned ID for an order.'
           type: string
           example: order_ff5b
 
@@ -249,7 +252,7 @@ components:
               type: string
               format: date-time
               description: RFC3339 formatted timestamp including UTC offset
-              example: "2009-01-01T12:59:59-05:00"
+              example: '2009-01-01T12:59:59-05:00'
 
     ImpressionEvent:
       description: A product has become visible to the consumer. In case you cannot send the impression when the product is visible, send us an impression event when the product was rendered in the HTML or if that's also not possible when your API returns the results. It is important to select the most specific event so that your vendors have more accurate CTR metrics, which allow them to better predict their campaigns.
@@ -268,8 +271,7 @@ components:
               type: string
               format: date-time
               description: RFC3339 formatted timestamp including UTC offset
-              example: "2009-01-01T12:59:59-05:00"
-
+              example: '2009-01-01T12:59:59-05:00'
 
     Impression:
       type: object
@@ -372,10 +374,11 @@ components:
           example: p_k39abc
 
     Slots:
-      description: "The Slots object specifies how many auctions winners should be
-                    returned for each promotion type. The promotion types depend on
-                    the marketplace configuration. \"listings\", \"videoAds\" and
-                    \"bannerAds\" are common."
+      description:
+        'The Slots object specifies how many auctions winners should be
+        returned for each promotion type. The promotion types depend on
+        the marketplace configuration. "listings", "videoAds" and
+        "bannerAds" are common.'
       type: object
       properties:
         listings:
@@ -411,7 +414,7 @@ components:
             - too_few_impressions
             - too_few_slots
         docUrl:
-          enum: ["https://topsort.redoc.ly"]
+          enum: ['https://topsort.redoc.ly']
         message:
           type: string
 
