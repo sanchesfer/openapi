@@ -258,8 +258,8 @@ components:
             example: Beers/Belgian
         required:
           - id
-      minItems: 1
-      maxItems: 51
+      minItems: 0
+      maxItems: 50
 
     PaginatedResponse:
       type: object
