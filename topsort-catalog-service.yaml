@@ -105,7 +105,7 @@ paths:
             When provided, will get the products (ordered by search relevance) of that page.
       responses:
         200:
-          description: Returns products' details for the provided search terms, if available.
+          description: Returns products' details for the provided search terms if available, separated in pages.
           content:
             application/json:
               schema:
