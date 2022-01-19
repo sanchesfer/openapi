@@ -24,7 +24,7 @@ security:
   - BearerAuth: []
 
 paths:
-  /auctions:
+  /auctions/:
     post:
       tags:
         - Auctions
@@ -52,7 +52,7 @@ paths:
         400:
           $ref: '#/components/responses/BadRequest'
 
-  /events:
+  /events/:
     post:
       tags:
         - Events
@@ -89,6 +89,34 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         400:
           $ref: '#/components/responses/BadRequest'
+      x-readme.code-samples:
+        - language: curl
+          code: |
+curl --request POST \
+    --url https://demo.api.topsort.com/v1/events \
+    --header 'Accept: application/json' \
+    --header 'Authorization: Bearer 27f2f6f2-a309-46d8-bb4c-d1095a6d26b1' \
+    --header 'Content-Type: application/json' \
+     --data '
+{
+     "session": {
+          "sessionId": "345bx7"
+     },
+     "eventType": "Impression",
+     "impressions": [
+          {
+               "placement": {},
+               "productId": "p_SA0238"
+          },
+          {
+               "placement": {
+                    "page": "search_results"
+               },
+               "productId": "p_SA0238"
+          }
+     ]
+}
+'
 
 components:
   responses:
