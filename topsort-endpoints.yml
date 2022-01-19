@@ -206,9 +206,9 @@ components:
         eventType:
           type: string
           enum:
-            - impression
-            - click
-            - purchase
+            - Impression
+            - Click
+            - Purchase
           description: Discriminator for the type of event.
         session:
           $ref: '#/components/schemas/Session'
