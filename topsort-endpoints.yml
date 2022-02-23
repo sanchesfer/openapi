@@ -115,8 +115,16 @@ components:
           minItems: 1
           items:
             $ref: '#/components/schemas/Product'
+        vendors:
+          type: array
+          description: An array of objects, each describing a vendor that should participate in the auction.
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/Vendor'
         session:
           $ref: '#/components/schemas/Session'
+        bannerOptions:
+          $ref: '#/components/schemas/BannerOptions'
 
     Auction:
       type: object
@@ -153,8 +161,26 @@ components:
           minimum: 0
         productId:
           type: string
-          description: The marketplace's ID for the product. It will match the ID for a product in the request's product array.
+          description: The marketplace's ID for the product. It will match the ID for a product in the request's products array.
           example: pSA0238
+        winnerType:
+          type: string
+          description: The type of the winning bid, depending on the campaign. It can be product or vendor.
+          enum:
+            - product
+            - vendor
+        winnerId:
+          type: string
+          description: The marketplace's ID of the winnning item, depending on the campaign.
+          example: b_Mfk15
+        resolvedBidId:
+          type: string
+          description: An opaque topsort ID to be used when this item is interacted with.
+          example: 'b23f2d4b-ec5d-465f-b399-fed34fc020c7'
+        assetUrl:
+          type: string
+          description: The vendor defined asset that the marketplace has to use as a banner.
+          example: 'https://address.to/image.png'
 
     Product:
       required:
@@ -173,6 +199,15 @@ components:
           format: float
       xml:
         name: Product
+    Vendor:
+      required:
+        - vendorId
+      type: object
+      properties:
+        vendorId:
+          type: string
+          format: string
+          example: v_89kjm
 
     Session:
       description: The Session object allows correlating user activity during a session whether or not they are actually logged in. For all calls to Topsort, include as many as are known.
@@ -198,8 +233,8 @@ components:
     Event:
       type: object
       required:
-        - eventType
         - session
+        - eventType
       discriminator:
         propertyName: eventType
       properties:
@@ -234,7 +269,6 @@ components:
         - type: object
           required:
             - placement
-            - productId
           properties:
             placement:
               $ref: '#/components/schemas/Placement'
@@ -255,6 +289,9 @@ components:
               format: date-time
               description: RFC3339 formatted timestamp including UTC offset
               example: '2009-01-01T12:59:59-05:00'
+            resolvedBidId:
+              type: string
+              example: 'b23f2d4b-ec5d-465f-b399-fed34fc020c7'
 
     ImpressionEvent:
       description: A product has become visible to the consumer. In case you cannot send the impression when the product is visible, send us an impression event when the product was rendered in the HTML or if that's also not possible when your API returns the results. It is important to select the most specific event so that your vendors have more accurate CTR metrics, which allow them to better predict their campaigns.
@@ -279,7 +316,6 @@ components:
       type: object
       required:
         - placement
-        - productId
       properties:
         placement:
           $ref: '#/components/schemas/Placement'
@@ -295,6 +331,9 @@ components:
           type: string
           description: The marketplace's ID for the impression.
           example: 234f678-f90c
+        resolvedBidId:
+          type: string
+          example: 'b23f2d4b-ec5d-465f-b399-fed34fc020c7'
 
     PurchaseEvent:
       description: The consumer has purchased some products.
@@ -347,6 +386,9 @@ components:
           minimum: 1
           description: The price of a single item in minor currency units. For example, in the US (currency code "USD") the unit price is specified in cents.
           example: 1295
+        resolvedBidId:
+          type: string
+          example: 'b23f2d4b-ec5d-465f-b399-fed34fc020c7'
 
     ImpressionResponse:
       type: object
@@ -387,6 +429,21 @@ components:
           type: integer
           example: 2
           minimum: 1
+        banners:
+          type: integer
+          example: 2
+          minimum: 1
+
+    BannerOptions:
+      description: 'The BannerOptions object specifies options to take into consideration when running a banner auction.'
+      type: object
+      properties:
+        placement:
+          type: string
+          enum:
+            - homepage
+            - categoryPage
+            - searchPage
 
     # Error Codes
 
