@@ -23,6 +23,41 @@ servers:
 tags:
   - name: Catalog
     description: Integration for Marketplaces' catalog queries.
+  - name: Models
+    x-displayName: All Models
+    description: |
+      ## Brand
+      <SchemaDefinition schemaRef="#/components/schemas/Brand" />
+
+      ## Category
+      <SchemaDefinition schemaRef="#/components/schemas/Category" />
+
+      ## GetProductsByID Request
+      <SchemaDefinition schemaRef="#/components/schemas/GetProductsByIDRequest" />
+
+      ## GetProductsByID Response
+      <SchemaDefinition schemaRef="#/components/schemas/GetProductsByIDResponse" />
+
+      ## Paginated Brands Response
+      <SchemaDefinition schemaRef="#/components/schemas/PaginatedBrandsResponse" />
+
+      ## Paginated Categories Response
+      <SchemaDefinition schemaRef="#/components/schemas/PaginatedCategoriesResponse" />
+
+      ## Paginated Products Response
+      <SchemaDefinition schemaRef="#/components/schemas/PaginatedProductsResponse" />
+
+      ## Paginated Response
+      <SchemaDefinition schemaRef="#/components/schemas/PaginatedResponse" />
+
+      ## Paginated Vendors Response
+      <SchemaDefinition schemaRef="#/components/schemas/PaginatedVendorsResponse" />
+
+      ## Product
+      <SchemaDefinition schemaRef="#/components/schemas/Product" />
+
+      ## Vendor
+      <SchemaDefinition schemaRef="#/components/schemas/Vendor" />
 
 security:
   - BearerAuth: []
@@ -149,7 +184,7 @@ paths:
       summary: Retrieves brands
       description: >
         This endpoint is optional. It is used to allow advanced use cases for Banner Ads. Talk to
-        your Account Manager to understand whehter you need to implement this endpoint.
+        your Account Manager to understand whether you need to implement this endpoint.
       operationId: getBrands
       parameters:
         - in: query
