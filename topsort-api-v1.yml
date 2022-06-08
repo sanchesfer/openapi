@@ -47,7 +47,10 @@ tags:
       ## Click Response
       <SchemaDefinition schemaRef="#/components/schemas/ClickResponse" />
 
-      ## GeoTargeting
+      ## Error
+      <SchemaDefinition schemaRef="#/components/schemas/Error" />
+
+      ## Geotargeting
       <SchemaDefinition schemaRef="#/components/schemas/GeoTargeting" />
 
       ## Impression
@@ -76,9 +79,6 @@ tags:
 
       ## Session
       <SchemaDefinition schemaRef="#/components/schemas/Session" />
-
-      ## Topsort Error
-      <SchemaDefinition schemaRef="#/components/schemas/TopsortError" />
 
       ## Vendor
       <SchemaDefinition schemaRef="#/components/schemas/Vendor" />
@@ -163,7 +163,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/TopsortError'
+            $ref: '#/components/schemas/Error'
 
   schemas:
     AuctionRequest:
@@ -651,15 +651,17 @@ components:
             - Category-page
             - Search-page
 
-    TopsortError:
+    Error:
       type: object
       required:
         - errCode
       properties:
         errCode:
           type: string
+          description: A short string uniquely identifying the problem.
           enum:
             - bad_request
+            - empty_request
             - internal_server_error
             - invalid_api_key
             - invalid_auction_id
@@ -674,12 +676,20 @@ components:
             - missing_slots
             - no_products
             - no_purchase_items
+            - purchase_item_quantity_less_or_equal_than_zero
+            - resolved_bid_id_not_found
             - too_few_impressions
             - too_few_slots
         docUrl:
-          enum: ['https://topsort-api.redoc.ly']
+          type: string
+          format: uri
+          description: A link to a documentation page providing more information about the error.
+          example: https://docs.topsort.com/reference/errors
         message:
           type: string
+          description: >
+            Human-readable explanation of or details about the error.
+            The string for a given error may change over time; code should not parse or dispatch based on particular values for this field.
 
   securitySchemes:
     BearerAuth:

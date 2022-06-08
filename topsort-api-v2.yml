@@ -36,14 +36,14 @@ tags:
       ## Category
       <SchemaDefinition schemaRef="#/components/schemas/Category" />
 
+      ## Error
+      <SchemaDefinition schemaRef="#/components/schemas/Error" />
+
       ## Geotargeting
       <SchemaDefinition schemaRef="#/components/schemas/GeoTargeting" />
 
       ## Product
       <SchemaDefinition schemaRef="#/components/schemas/Product" />
-
-      ## Topsort Error
-      <SchemaDefinition schemaRef="#/components/schemas/TopsortError" />
 
       ## Winner
       <SchemaDefinition schemaRef="#/components/schemas/Winner" />
@@ -129,12 +129,14 @@ paths:
                           winnerType: product
                           winnerId: p_PJbnN
                           resolvedBidId: WyJlX1BKYm5OIiwiMTJhNTU4MjgtOGVhZC00Mjk5LTgzMjctY2ViYjAwMmEwZmE4IiwibGlzdGluZ3MiLCJkZWZhdWx0IiwiIl0=
+                      error: false
                     - winners:
                         - rank: 1
                           winnerType: product
                           winnerId: p_PJbnN
                           resolvedBidId: WyJlX1BKYm5OIiwiMTJhNTU4MjgtOGVhZC00Mjk5LTgzMjctY2ViYjAwMmEwZmE4IiwiYmFubmVyQWRzIiwiZGVmYXVsdCIsIiJd
                           assetUrl: https://topsort.cdnprovider.com/lhs-banner-image-for-p_PJbnN.png
+                      error: false
         401:
           $ref: '#/components/responses/UnauthorizedError'
         400:
@@ -149,7 +151,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/TopsortError'
+            $ref: '#/components/schemas/Error'
 
   schemas:
     Category:
@@ -277,11 +279,15 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Winner'
-          description:
-            'Array of winner objects in order from highest to lowest bid.
-            May be empty if there were no qualifying bids.'
+          description: >
+            Array of winner objects in order from highest to lowest bid.
+            It will be empty if there were no qualifying bids or if there was an error.
+        error:
+          type: boolean
+          description: A boolean indicating whether this auction was resolved successfully.
       required:
         - winners
+        - error
 
     Winner:
       type: object
@@ -332,21 +338,26 @@ components:
             These ID must match those in the catalog integration with Topsort.
           example: p_SA0238
 
-    TopsortError:
+    Error:
       type: object
       required:
         - errCode
       properties:
         errCode:
           type: string
+          description: A short string uniquely identifying the problem.
           enum:
             - bad_request
+            - empty_request
             - internal_server_error
             - invalid_api_key
             - invalid_auction_id
             - invalid_event_type
             - invalid_promotion_type
             - invalid_session
+            - missing_aspect_ratio
+            - missing_auctions
+            - missing_context
             - missing_placement
             - missing_product_id
             - missing_promotion_type
@@ -355,12 +366,21 @@ components:
             - missing_slots
             - no_products
             - no_purchase_items
+            - purchase_item_quantity_less_or_equal_than_zero
+            - resolved_bid_id_not_found
             - too_few_impressions
             - too_few_slots
+            - too_many_auctions
         docUrl:
-          enum: ['https://topsort-api.redoc.ly']
+          type: string
+          format: uri
+          description: A link to a documentation page providing more information about the error.
+          example: https://docs.topsort.com/reference/errors
         message:
           type: string
+          description: >
+            Human-readable explanation of or details about the error.
+            The string for a given error may change over time; code should not parse or dispatch based on particular values for this field.
 
   securitySchemes:
     BearerAuth:
