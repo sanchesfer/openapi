@@ -2,8 +2,21 @@ openapi: 3.0.2
 info:
   title: Catalog API
   version: 0.1.1
+  description: Integration API to sync your catalog with Topsort.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  x-logo:
+    url: https://assets.website-files.com/61a717c57f45d64e5e24eebf/61ee6ccc3f6a684756ef6dec_logo.svg
+    backgroundColor: '#fff'
+    altText: Topsort
+servers:
+  - url: https://central-services.api.sandbox.topsort.ai/public/v1/catalog-search-service
+    description: Sandbox server
+security:
+  - HTTPBearer: []
 paths:
-  /catalog/categories:
+  /catalogs/categories:
     get:
       tags:
         - Categories API
@@ -67,7 +80,7 @@ paths:
         #         $ref: '#/components/schemas/HTTPConflictError'
       security:
         - HTTPBearer: []
-  /catalog/categories/{categoryId}:
+  /catalogs/categories/{categoryId}:
     get:
       tags:
         - Categories API
@@ -96,7 +109,7 @@ paths:
                 $ref: '#/components/schemas/HTTPNotFoundError'
       security:
         - HTTPBearer: []
-  /catalog/products:
+  /catalogs/products:
     get:
       tags:
         - Products API
@@ -152,7 +165,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPNotFoundError'
-  /catalog/products/{productId}:
+  /catalogs/products/{productId}:
     get:
       tags:
         - Products API
@@ -181,7 +194,7 @@ paths:
                 $ref: '#/components/schemas/HTTPNotFoundError'
       security:
         - HTTPBearer: []
-  /catalog/vendors:
+  /catalogs/vendors:
     get:
       tags:
         - Vendors API
@@ -237,7 +250,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPNotFoundError'
-  /catalog/vendors/{vendorId}:
+  /catalogs/vendors/{vendorId}:
     get:
       tags:
         - Vendors API
@@ -343,7 +356,6 @@ components:
           type: string
           minLength: 1
           example: eyGqR4YQgBJa
-          readOnly: true
         name:
           description: The product name.
           type: string
@@ -355,7 +367,7 @@ components:
           minLength: 1
           example: >
             Named as "Best Beer in the World" in 2008 at the World Beer Championships in Chicago, Illinois.
-        vendorIds:
+        vendors:
           description: The vendor IDs.
           type: array
           items:
@@ -364,7 +376,7 @@ components:
           minLength: 1
           example:
             - 9SiwYqqL8vdG
-        categoryIds:
+        categories:
           description: The category IDs.
           type: array
           items:
@@ -388,11 +400,30 @@ components:
           minimum: 0.0
           exclusiveMinimum: true
           example: 18.99
+        brand:
+          description: The product brand information.
+          type: object
+          properties:
+            id:
+              type: string
+              description: The brand ID.
+              example: es5086vyV
+            name:
+              type: string
+              description: The brand name.
+              example: Delirium
+          required:
+            - id
+            - name
       required:
         - id
         - name
-        - vendorIds
-        - categoryIds
+        - description
+        - vendors
+        - categories
+        - brand
+        - price
+        - imageUrl
     Products:
       type: object
       properties:
@@ -430,7 +461,6 @@ components:
           type: string
           minLength: 1
           example: 9SiwYqqL8vdG
-          readOnly: true
         name:
           description: The vendor name.
           type: string
