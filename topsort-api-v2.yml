@@ -21,6 +21,8 @@ servers:
 tags:
   - name: Auctions
     description: An auction determines which products should be promoted based on the vendors' bids.
+  - name: Events
+    description: Significant consumer interactions on the marketplace app.
   - name: Models
     x-displayName: All Models
     description: |
@@ -30,23 +32,38 @@ tags:
       ## Auction
       <SchemaDefinition schemaRef="#/components/schemas/Auction" />
 
-      ## Auction Request (Banners)
+      ## Auctions Request (Banners)
       <SchemaDefinition schemaRef="#/components/schemas/AuctionRequestBanners" />
 
-      ## Auction Request (Sponsored Listings)
+      ## Auctions Request (Sponsored Listings)
       <SchemaDefinition schemaRef="#/components/schemas/AuctionRequestSponsoredListings" />
 
       ## Category
       <SchemaDefinition schemaRef="#/components/schemas/Category" />
 
+      ## Click
+      <SchemaDefinition schemaRef="#/components/schemas/Click" />
+
       ## Error
       <SchemaDefinition schemaRef="#/components/schemas/Error" />
+
+      ## Events Request
+      <SchemaDefinition schemaRef="#/components/schemas/EventsRequest" />
 
       ## Geotargeting
       <SchemaDefinition schemaRef="#/components/schemas/GeoTargeting" />
 
+      ## Impression
+      <SchemaDefinition schemaRef="#/components/schemas/Impression" />
+
       ## Products
       <SchemaDefinition schemaRef="#/components/schemas/Products" />
+
+      ## Purchase
+      <SchemaDefinition schemaRef="#/components/schemas/Purchase" />
+
+      ## Purchase Item
+      <SchemaDefinition schemaRef="#/components/schemas/PurchaseItem" />
 
       ## Winner
       <SchemaDefinition schemaRef="#/components/schemas/Winner" />
@@ -59,8 +76,8 @@ paths:
     post:
       tags:
         - Auctions
-      summary: Creates a new auction
-      operationId: createAuction
+      summary: Create new auctions
+      operationId: createAuctions
       requestBody:
         description: >
           The information describing what will be auctioned.
@@ -148,6 +165,30 @@ paths:
           $ref: '#/components/responses/BadRequest'
         402:
           $ref: '#/components/responses/PaymentRequired'
+  /events:
+    post:
+      tags:
+        - Events
+      summary: Report events
+      operationId: reportEvents
+      requestBody:
+        description: >
+          Use the `/events` endpoint to notify Topsort about significant consumer interactions on the marketplace app:
+          impressions — ad promotions become visible to the consumer;
+          clicks — the consumer clicks on an ad promotion;
+          and purchases — the consumer buys some products.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventsRequest'
+        required: true
+      responses:
+        204:
+          description: All events were reported successfully.
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        400:
+          $ref: '#/components/responses/BadRequest'
 
 components:
   responses:
@@ -302,6 +343,7 @@ components:
         error:
           type: boolean
           description: A boolean indicating whether this auction was resolved successfully.
+          example: false
       required:
         - winners
         - error
@@ -466,6 +508,207 @@ components:
           description: >
             Human-readable explanation of or details about the error.
             The string for a given error may change over time; code should not parse or dispatch based on particular values for this field.
+    Placement:
+      type: object
+      required:
+        - path
+      properties:
+        path:
+          type: string
+          description: >
+            URL path of the page triggering the event.
+            For web apps, this can be obtained in JS using `window.location.pathname`.
+
+            For mobile apps, use the deep link for the current view, if available.
+            Otherwise, encode the view from which the event occurred in your app as a path-like string (e.g. `/root/categories/:categoryId`).
+          minLength: 1
+          example: /categories/dairy
+        position:
+          type: integer
+          description: >
+            For components with multiple items
+            (i.e. search results, similar products, etc),
+            this should indicate the index of a given item within that list.
+          minimum: 1
+        page:
+          type: integer
+          description: >
+            For paginated pages, this should indicate which page number triggered the event.
+          minimum: 1
+        pageSize:
+          type: integer
+          description: >
+            For paginated pages this should indicate how many items are in each result page.
+          minimum: 1
+          example: 15
+        productId:
+          type: string
+          description: >
+            The ID of the product associated to this event.
+            This field is used to disambiguate between products from the same PLP.
+          minLength: 1
+        categoryId:
+          type: string
+          description: >
+            The ID of the category associated to the page in which this event occurred, if applicable.
+            This ID must match the ID provided through the catalog service.
+          minLength: 1
+        searchQuery:
+          type: string
+          description: >
+            The search string provided by the user in the page where this event occurred, if applicable.
+            This search string must match the searchQuery field that was provided in the auction request (if provided).
+          minLength: 1
+    EventsRequest:
+      type: object
+      properties:
+        impressions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Impression'
+          minItems: 1
+          maxItems: 50
+        clicks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Click'
+          minItems: 1
+          maxItems: 50
+        purchases:
+          type: array
+          items:
+            $ref: '#/components/schemas/Purchase'
+          minItems: 1
+          maxItems: 50
+      minProperties: 1
+      additionalProperties: false
+    Impression:
+      type: object
+      description: >
+        An impression means an ad has become visible to the consumer.
+        In case you cannot send an impression when the product becomes visible, send us an impression event when the product was rendered in the HTML or, if that's also not possible, when your API returns the results.
+        It is important to select the most specific event so that your vendors have more accurate CTR metrics, which will allow them to better predict their campaigns.
+      required:
+        - occurredAt
+        - opaqueUserId
+        - id
+      properties:
+        resolvedBidId:
+          type: string
+          description: If the impression is over an ad promotion, this is the `resolvedBidId` field received from the `/auctions` request.
+          example: WyJiX01mazE1IiwiMTJhNTU4MjgtOGVhZC00Mjk5LTgzMjctY2ViYjAwMmEwZmE4IiwibGlzdGluZ3MiLCJkZWZhdWx0IiwiIl0=
+        placement:
+          $ref: '#/components/schemas/Placement'
+        occurredAt:
+          type: string
+          format: date-time
+          description: RFC3339 formatted timestamp including UTC offset.
+          example: '2009-01-01T12:59:59-05:00'
+        opaqueUserId:
+          type: string
+          description: >
+            The opaque user ID allows correlating user activity, whether or not they are actually logged in.
+            It must be long lived.
+          example: 71303ce0-de89-496d-8270-6434589615e8
+        id:
+          type: string
+          description: >
+            The marketplace's unique ID for the impression.
+            This field ensures the event reporting is idempotent in case there is a network issue and the request is retried.
+            If there is no impression model on the marketplace side, generate a unique string that does not change if the event is resent.
+          example: eb874c98-bf4d-40a9-ae6d-fcf4cecb535c
+    Click:
+      description: >
+        A click is sent to Topsort when the consumer has clicked on an ad.
+        Topsort charges the vendor and pays the marketplace for clicks on ads in promoted placements on the marketplace app.
+      type: object
+      required:
+        - occurredAt
+        - opaqueUserId
+        - id
+      properties:
+        resolvedBidId:
+          type: string
+          description: If the click is over an ad promotion, this is the `resolvedBidId` field received from the `/auctions` request.
+          example: WyJiX01mazE1IiwiMTJhNTU4MjgtOGVhZC00Mjk5LTgzMjctY2ViYjAwMmEwZmE4IiwibGlzdGluZ3MiLCJkZWZhdWx0IiwiIl0=
+        placement:
+          $ref: '#/components/schemas/Placement'
+        occurredAt:
+          type: string
+          format: date-time
+          description: RFC3339 formatted timestamp including UTC offset.
+          example: '2009-01-01T12:59:59-05:00'
+        opaqueUserId:
+          type: string
+          description: >
+            The opaque user ID allows correlating user activity, whether or not they are actually logged in.
+            It must be long lived.
+          example: 71303ce0-de89-496d-8270-6434589615e8
+        id:
+          type: string
+          description: >
+            The marketplace's unique ID for the click.
+            This field ensures the event reporting is idempotent in case there is a network issue and the request is retried.
+            If there is no click model on the marketplace side, generate a unique string that does not change if the event is resent.
+          example: b39d39ed-ea0e-4059-9d15-4990b39c85a2
+    Purchase:
+      description: >
+        A purchase is sent to Topsort once a marketplace customer places an order.
+        These events are used to measure the effectiveness of an ad campaign.
+      type: object
+      required:
+        - occurredAt
+        - opaqueUserId
+        - items
+        - id
+      properties:
+        occurredAt:
+          type: string
+          description: RFC3339 formatted timestamp, including UTC offset, of the instant in which the order was placed.
+          example: '2021-10-12T07:20:50.52Z'
+          format: date-time
+        opaqueUserId:
+          type: string
+          description: >
+            The opaque user ID allows correlating user activity, whether or not they are actually logged in.
+            It must be long lived.
+          example: 71303ce0-de89-496d-8270-6434589615e8
+        items:
+          type: array
+          description: Items purchased.
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/PurchaseItem'
+        id:
+          type: string
+          description: >
+            The marketplace unique ID for the order.
+            This field ensures the event reporting is idempotent in case there is a network issue and the request is retried.
+            If there is no unique ID for orders on the marketplace side, generate a unique string that does not change if the event is resent.
+          example: 0e06c899-b2cd-4e0d-b0de-8aefb4b6d0a0
+    PurchaseItem:
+      type: object
+      required:
+        - productId
+        - unitPrice
+      properties:
+        productId:
+          type: string
+          description: The marketplace ID of the product being purchased.
+          example: p_SA0238
+        quantity:
+          type: integer
+          minimum: 1
+          default: 1
+          description: Count of products purchased.
+          example: 2
+        unitPrice:
+          type: number
+          format: float
+          minimum: 0.0
+          exclusiveMinimum: true
+          description: The price of a single item in the marketplace currency.
+          example: 12.95
 
   securitySchemes:
     BearerAuth:
