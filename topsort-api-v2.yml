@@ -21,8 +21,13 @@ servers:
 tags:
   - name: Auctions
     description: An auction determines which products should be promoted based on the vendors' bids.
-  - name: Events
-    description: Significant consumer interactions on the marketplace app.
+  - name: Events (Beta)
+    description: >
+      **The specification details, particularly around unpromoted events and placement data, will change in the short term.**
+      **Please use [Events V1](https://openapi.topsort.com/api/v1#operation/reportEvent) for now if you need a stable API to report events.**
+
+
+      Significant consumer interactions on the marketplace app.
   - name: Models
     x-displayName: All Models
     description: |
@@ -168,7 +173,7 @@ paths:
   /events:
     post:
       tags:
-        - Events
+        - Events (Beta)
       summary: Report events
       operationId: reportEvents
       requestBody:
@@ -545,7 +550,7 @@ components:
           type: string
           description: >
             The ID of the product associated to this event.
-            This field is used to disambiguate between products from the same PLP.
+            This field is used to disambiguate between products from the same PDP.
           minLength: 1
         categoryId:
           type: string
