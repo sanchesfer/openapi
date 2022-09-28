@@ -1,6 +1,10 @@
 openapi: 3.0.1
 info:
   title: Topsort Endpoints API Reference
+  description: >-
+    In order for a storefront to be able to run auctions in Topsort and report auction-related events back to Topsort,
+    both the `/v2/auctions` and `/v2/events` endpoints must be integrated.
+    Below are the endpoint and model definitions for each.
   contact:
     email: wicha@topsort.com
   license:
@@ -15,7 +19,7 @@ info:
 servers:
   - url: https://<slug>.api.sandbox.topsort.ai/v2
     description: Sandbox server (uses test data)
-  - url: https://<slug>.api.topsort.ai//v2
+  - url: https://<slug>.api.topsort.ai/v2
     description: Production server (uses live data)
 
 tags:
@@ -87,7 +91,7 @@ paths:
         description: >
           The information describing what will be auctioned.
           Topsort will run an auction for each batched auction request, for which products, brands and/or vendors' bids will compete against each other.
-          Provided fields are additive, in the sense that only bids that match all filtering fields are considered (e.g. in the example below, only bids for products in the c_yogurt category that match the "Noosa Peach" search string will participate in the acution).
+          Provided fields are additive, in the sense that only bids that match all filtering fields are considered (e.g. in the example below, only bids for products in the c_yogurt category that match the "Noosa Peach" search string will participate in the auction).
         content:
           application/json:
             schema:
@@ -163,6 +167,8 @@ paths:
                           resolvedBidId: WyJlX1BKYm5OIiwiMTJhNTU4MjgtOGVhZC00Mjk5LTgzMjctY2ViYjAwMmEwZmE4IiwiYmFubmVyQWRzIiwiZGVmYXVsdCIsIiJd
                           asset:
                             - url: https://topsort.cdnprovider.com/lhs-banner-image-for-p_PJbnN-1x.png
+                      error: false
+                    - winners: {}
                       error: false
         401:
           $ref: '#/components/responses/UnauthorizedError'
@@ -517,6 +523,7 @@ components:
       type: object
       required:
         - path
+      additionalProperties: false
       properties:
         path:
           type: string
@@ -566,6 +573,7 @@ components:
           minLength: 1
     EventsRequest:
       type: object
+      additionalProperties: false
       properties:
         impressions:
           type: array
@@ -586,6 +594,39 @@ components:
           minItems: 1
           maxItems: 50
       minProperties: 1
+      example:
+        impressions:
+          - id: eb874c98-bf4d-40a9-ae6d-fcf4cecb535c
+            occurredAt: '2019-01-01T12:59:59-05:00'
+            opaqueUserId: 71303ce0-de89-496d-8270-6434589615e8
+            placement:
+              path: /categories/dairy
+              position: 1
+              page: 1
+              pageSize: 15
+              categoryId: 9BLIe
+            resolvedBidId: WyJiX01mazE1IiwiMTJhNTU4MjgtOGVhZC00Mjk5LTgzMjctY2ViYjAwMmEwZmE4IiwibGlzdGluZ3MiLCJkZWZhdWx0IiwiIl0=
+        clicks:
+          - id: b39d39ed-ea0e-4059-9d15-4990b39c85a2
+            occurredAt: '2019-01-01T13:01:42-05:00'
+            opaqueUserId: 71303ce0-de89-496d-8270-6434589615e8
+            placement:
+              path: /categories/dairy
+              position: 1
+              page: 1
+              pageSize: 15
+              categoryId: 9BLIe
+            resolvedBidId: WyJiX01mazE1IiwiMTJhNTU4MjgtOGVhZC00Mjk5LTgzMjctY2ViYjAwMmEwZmE4IiwibGlzdGluZ3MiLCJkZWZhdWx0IiwiIl0=
+        purchases:
+          - id: 0e06c899-b2cd-4e0d-b0de-8aefb4b6d0a0
+            items:
+              - productId: p_SA0238
+                unitPrice: 12.95
+                quantity: 2
+              - productId: p_oajf2D
+                unitPrice: 1.49
+            occurredAt: '2019-01-01T12:59:59-05:00'
+            opaqueUserId: 71303ce0-de89-496d-8270-6434589615e8
     Impression:
       type: object
       description: >
@@ -596,6 +637,7 @@ components:
         - occurredAt
         - opaqueUserId
         - id
+      additionalProperties: false
       properties:
         resolvedBidId:
           type: string
@@ -630,6 +672,7 @@ components:
         - occurredAt
         - opaqueUserId
         - id
+      additionalProperties: false
       properties:
         resolvedBidId:
           type: string
@@ -665,6 +708,7 @@ components:
         - opaqueUserId
         - items
         - id
+      additionalProperties: false
       properties:
         occurredAt:
           type: string
@@ -688,13 +732,14 @@ components:
           description: >
             The marketplace unique ID for the order.
             This field ensures the event reporting is idempotent in case there is a network issue and the request is retried.
-            If there is no unique ID for orders on the marketplace side, generate a unique string that does not change if the event is resent.
+            If there is no unique ID for orders on the marketplace side, generate a unique string that does not change if the event needs to be resent.
           example: 0e06c899-b2cd-4e0d-b0de-8aefb4b6d0a0
     PurchaseItem:
       type: object
       required:
         - productId
         - unitPrice
+      additionalProperties: false
       properties:
         productId:
           type: string
@@ -708,7 +753,7 @@ components:
           example: 2
         unitPrice:
           type: number
-          format: float
+          format: double
           minimum: 0.0
           exclusiveMinimum: true
           description: The price of a single item in the marketplace currency.
