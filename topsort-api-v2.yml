@@ -26,10 +26,9 @@ tags:
   - name: Auctions
     description: An auction determines which products should be promoted based on the vendors' bids.
   - name: Events (Beta)
-    description: >
-      **The specification details, particularly around unpromoted events and placement data, will change in the short term.**
-      **Please use [Events V1](https://openapi.topsort.com/api/v1#operation/reportEvent) for now if you need a stable API to report events.**
-
+    description: |
+      **The specification details, particularly around placement data, may change in the short term.**
+      **If this is not acceptable for your integration, please use [Events V1](https://openapi.topsort.com/api/v1#operation/reportEvent) as an alternative.**
 
       Significant consumer interactions on the marketplace app.
   - name: Models
@@ -183,11 +182,14 @@ paths:
       summary: Report events
       operationId: reportEvents
       requestBody:
-        description: >
+        description: |
           Use the `/events` endpoint to notify Topsort about significant consumer interactions on the marketplace app:
-          impressions — ad promotions become visible to the consumer;
-          clicks — the consumer clicks on an ad promotion;
-          and purchases — the consumer buys some products.
+          - **Impressions** — a set of impressions means such promotables have become visible to the consumer.
+          - **Clicks** — a click is sent to Topsort when the consumer has clicked on a promotable.
+          - **Purchases** — a purchase is sent to Topsort once a consumer places an order.
+
+          For promoted interactions, include the `resolvedBidId` field from the `/v2/auctions` response.
+          For unpromoted interactions, include the `entity` field to describe what was interacted with.
         content:
           application/json:
             schema:
@@ -534,8 +536,9 @@ components:
       properties:
         path:
           type: string
-          description: >
+          description: |
             URL path of the page triggering the event.
+
             For web apps, this can be obtained in JS using `window.location.pathname`.
 
             For mobile apps, use the deep link for the current view, if available.
@@ -563,8 +566,8 @@ components:
         productId:
           type: string
           description: >
-            The ID of the product associated to this event.
-            This field is used to disambiguate between products from the same PDP.
+            The ID of the product associated to the page in which this event occurred, if applicable.
+            This ID must match the ID provided through the catalog service.
           minLength: 1
         categoryIds:
           type: array
@@ -583,6 +586,26 @@ components:
             The search string provided by the user in the page where this event occurred, if applicable.
             This search string must match the searchQuery field that was provided in the auction request (if provided).
           minLength: 1
+    Entity:
+      type: object
+      description: >
+        The entity associated with the promotable over which the interaction occurred.
+        It will be ignored if `resolvedBidId` is not blank.
+      required:
+        - id
+        - type
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          description: The marketplace's ID of the entity associated with the interaction.
+          minLength: 1
+        type:
+          type: string
+          description: The type of entity associated with the interaction.
+          enum:
+            - product
+            - vendor
     EventsRequest:
       type: object
       additionalProperties: false
@@ -642,7 +665,9 @@ components:
     Impression:
       type: object
       description: >
-        An impression means an ad has become visible to the consumer.
+        An impression means a promotable has become visible to the consumer.
+        For promoted entities, include the `resolvedBidId` field from the `/v2/auctions` response.
+        For unpromoted entities, include the `entity` field to describe what was seen.
         In case you cannot send an impression when the product becomes visible, send us an impression event when the product was rendered in the HTML or, if that's also not possible, when your API returns the results.
         It is important to select the most specific event so that your vendors have more accurate CTR metrics, which will allow them to better predict their campaigns.
       required:
@@ -655,6 +680,8 @@ components:
           type: string
           description: If the impression is over an ad promotion, this is the `resolvedBidId` field received from the `/auctions` request.
           example: WyJiX01mazE1IiwiMTJhNTU4MjgtOGVhZC00Mjk5LTgzMjctY2ViYjAwMmEwZmE4IiwibGlzdGluZ3MiLCJkZWZhdWx0IiwiIl0=
+        entity:
+          $ref: '#/components/schemas/Entity'
         placement:
           $ref: '#/components/schemas/Placement'
         occurredAt:
@@ -677,7 +704,9 @@ components:
           example: eb874c98-bf4d-40a9-ae6d-fcf4cecb535c
     Click:
       description: >
-        A click is sent to Topsort when the consumer has clicked on an ad.
+        A click is sent to Topsort when the consumer has clicked on a promotable.
+        For promoted entities, include the `resolvedBidId` field from the `/v2/auctions` response.
+        For unpromoted entities, include the `entity` field to describe what was clicked.
         Topsort charges the vendor and pays the marketplace for clicks on ads in promoted placements on the marketplace app.
       type: object
       required:
@@ -690,6 +719,8 @@ components:
           type: string
           description: If the click is over an ad promotion, this is the `resolvedBidId` field received from the `/auctions` request.
           example: WyJiX01mazE1IiwiMTJhNTU4MjgtOGVhZC00Mjk5LTgzMjctY2ViYjAwMmEwZmE4IiwibGlzdGluZ3MiLCJkZWZhdWx0IiwiIl0=
+        entity:
+          $ref: '#/components/schemas/Entity'
         placement:
           $ref: '#/components/schemas/Placement'
         occurredAt:
