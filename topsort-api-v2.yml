@@ -49,6 +49,9 @@ tags:
       ## Category
       <SchemaDefinition schemaRef="#/components/schemas/Category" />
 
+      ## Category Disjunction
+      <SchemaDefinition schemaRef="#/components/schemas/CategoryDisjunction" />
+
       ## Click
       <SchemaDefinition schemaRef="#/components/schemas/Click" />
 
@@ -107,6 +110,16 @@ paths:
                 auctions:
                   - type: listings
                     slots: 2
+                    category:
+                      disjunctions:
+                        - ids:
+                            - c_large
+                            - c_medium
+                        - ids:
+                            - c_red
+                            - c_blue
+                  - type: listings
+                    slots: 2
                     products:
                       ids:
                         - p_PJbnN
@@ -120,10 +133,6 @@ paths:
                     slotId: categories-ribbon-banner
                     category:
                       id: c_yogurt
-                  - type: banners
-                    slots: 1
-                    aspectRatio: '3:2'
-                    searchQuery: Noosa Peach
         required: true
       responses:
         201:
@@ -217,16 +226,74 @@ components:
 
   schemas:
     Category:
+      oneOf:
+        - type: object
+          title: Single Category
+          description: A category for the purpose of running an auction.
+          required:
+            - id
+          properties:
+            id:
+              type: string
+              description: The category ID of the bids that will participate in an auction.
+              minLength: 1
+              example: c_yogurt
+        - type: object
+          title: Multiple Categories
+          description: A set of categories for the purpose of running an auction.
+          required:
+            - ids
+          properties:
+            ids:
+              type: array
+              description: |
+                An array containing the category IDs of the bids that will participate in an auction.
+                In order to participate in an auction, a bid product must belong to **all** of the categories provided in the auction request.
+              items:
+                type: string
+                description: A category ID.
+                minLength: 1
+              minItems: 1
+              example:
+                - c_men_clothing
+                - c_shoes
+        - type: object
+          title: Category Disjunctions
+          description: Multiple disjunctions of categories for the purpose of running an auction.
+          required:
+            - disjunctions
+          properties:
+            disjunctions:
+              type: array
+              description: |
+                An array of disjunctions.
+
+                In order to participate in an auction, a bid product must belong to at least one of the categories for each of the disjunctions provided in the auction request.
+              items:
+                $ref: '#/components/schemas/CategoryDisjunction'
+              minItems: 1
+              example:
+                - ids:
+                    - c_red
+                    - c_blue
+                - ids:
+                    - c_circle
+                    - c_square
+
+    CategoryDisjunction:
       type: object
-      description: An object describing a category for the purpose of running an auction.
-      required:
-        - id
       properties:
-        id:
-          type: string
-          description: The ID of the category.
-          minLength: 1
-          example: c_yogurt
+        ids:
+          type: array
+          description: |
+            An array of category IDs, describing a category disjunction.
+
+            A bid entity must belong to at least one of the categories in the disjunction in order to participate in the auction.
+          items:
+            type: string
+            description: A category ID.
+            minimum: 1
+          minItems: 1
 
     Device:
       type: string
