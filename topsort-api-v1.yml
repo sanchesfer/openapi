@@ -214,7 +214,10 @@ components:
         - location
       properties:
         location:
-          description: The location this banner is being run for.
+          description: >
+            By using this option, you will filter products that belong to campaigns that have the same location configuration.
+            Use cases for this configuration can be, for example: creating campaigns for specific countries, cities,
+            or special placements on the App, such as checkout, cross-sell, swimlanes, etc.
           type: string
           minLength: 1
 
