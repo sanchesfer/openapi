@@ -487,9 +487,18 @@ components:
           description: |-
             The marketplace's ID of the winning entity or an URL for a banner destination page, depending on the target of the campaign.
           examples:
-            - p_Mfk15
-            - https://your.marketplace.com/products/path-to-a-product-page
-            - intent://your.markketplace.com/_u/products/path-to-a-product-page_#Intent;package=com.marketplace.android;scheme=https;end
+            product:
+              value: p_Mfk15
+              summary: A product ID.
+            vendor:
+              value: my-vendor-name
+              summary: A vendor ID.
+            URL:
+              value: https://your.marketplace.com/products/path-to-a-product-page
+              summary: A web URL.
+            DeepLink:
+              value: intent://your.markketplace.com/_u/products/path-to-a-product-page_#Intent;package=com.marketplace.android;scheme=https;end
+              summary: A mobile app deeplink.
         resolvedBidId:
           type: string
           description: An opaque Topsort ID to be used when this item is interacted with.
