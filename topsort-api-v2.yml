@@ -485,8 +485,11 @@ components:
         id:
           type: string
           description: |-
-            The marketplace's ID of the winning entity, depending on the target of the campaign.
-          example: p_Mfk15
+            The marketplace's ID of the winning entity or an URL for a banner destination page, depending on the target of the campaign.
+          examples:
+            - p_Mfk15
+            - https://your.marketplace.com/products/path-to-a-product-page
+            - intent://your.markketplace.com/_u/products/path-to-a-product-page_#Intent;package=com.marketplace.android;scheme=https;end
         resolvedBidId:
           type: string
           description: An opaque Topsort ID to be used when this item is interacted with.
