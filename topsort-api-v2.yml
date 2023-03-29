@@ -115,7 +115,7 @@ paths:
               example:
                 auctions:
                   - type: listings
-                    slots: 2
+                    slots: 1
                     category:
                       disjunctions:
                         - - c_large
@@ -137,6 +137,9 @@ paths:
                     slotId: categories-ribbon-banner
                     category:
                       id: c_yogurt
+                  - type: banners
+                    slots: 1
+                    slotId: homepage-banner
         required: true
       responses:
         201:
@@ -164,6 +167,12 @@ paths:
                     - winners:
                         - rank: 1
                           type: product
+                          id: p_Mfk11
+                          resolvedBidId: WyJiX01mazExIiwiMTJhNTU4MjgtOGVhZC00Mjk5LTMyNjYtY2ViYjAwMmEwZmE4IiwibGlzdGluZ3MiLCJkZWZhdWx0IiwiIl0==
+                      error: false
+                    - winners:
+                        - rank: 1
+                          type: product
                           id: p_Mfk15
                           resolvedBidId: WyJiX01mazE1IiwiMTJhNTU4MjgtOGVhZC00Mjk5LTgzMjctY2ViYjAwMmEwZmE4IiwibGlzdGluZ3MiLCJkZWZhdWx0IiwiIl0=
                         - rank: 2
@@ -179,7 +188,7 @@ paths:
                           asset:
                             - url: https://topsort.cdnprovider.com/lhs-banner-image-for-p_PJbnN-1x.png
                       error: false
-                    - winners: {}
+                    - winners: []
                       error: false
         401:
           $ref: '#/components/responses/UnauthorizedError'
@@ -309,7 +318,7 @@ components:
         - location
       properties:
         location:
-          description: The location this banner is being run for.
+          description: The location this auction is being run for.
           type: string
 
     SponsoredListingsAuction:
@@ -364,7 +373,7 @@ components:
       description: |
         Describes the intent of running a banner ads auction.
 
-          * For **Homepage** banners, `category` and `searchQuery` must be empty.
+          * For **Landing Page** banners, `category` and `searchQuery` must be empty.
           * For **Category** banners, the `category` field must be set.
           * For **Keywords** banners, the `searchQuery` field must be set.
       properties:
@@ -393,15 +402,6 @@ components:
           minLength: 1
         products:
           $ref: '#/components/schemas/Products'
-        aspectRatio:
-          type: string
-          pattern: '^\d+:\d+$'
-          description: |
-            **Deprecated: use slotId instead.**
-
-            The aspect ratio for a specific slot for a banner placement in the marketplace app.
-            The aspect ratio for the category (or home page, if no category ID was provided in the request) must have been previously set up in the Topsort app.
-          deprecated: true
       required:
         - type
         - slots
