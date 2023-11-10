@@ -82,13 +82,13 @@ tags:
 
       ## Winner (Sponsored Listings)
       <SchemaDefinition schemaRef="#/components/schemas/SponsoredListingsWinner" />
-      
+
       ## Autobidding Result
       <SchemaDefinition schemaRef="#/components/schemas/AutobiddingResult" />
-      
+
       ## Autobidding Bid
       <SchemaDefinition schemaRef="#/components/schemas/AutobiddingBid" />
-      
+
       ## Autobidding Bid Info
       <SchemaDefinition schemaRef="#/components/schemas/AutobiddingBidInfo" />
 
@@ -336,7 +336,7 @@ paths:
                             amount: 24
                             qualityScore: 0.1
                       error: false
-                    - winners: [ ]
+                    - winners: []
                       error: false
         401:
           $ref: '#/components/responses/UnauthorizedError'
@@ -1127,7 +1127,6 @@ components:
         - winners
         - error
         - resultType
-
 
     AutobiddingBid:
       description: >
