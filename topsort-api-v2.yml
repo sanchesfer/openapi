@@ -241,7 +241,7 @@ paths:
     post:
       tags:
         - Auctions
-      summary: Create new autobidding requests
+      summary: (Preview) Create new autobidding requests
       operationId: createAutobiddingRequest
       requestBody:
         description: |
