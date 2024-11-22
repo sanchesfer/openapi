@@ -727,7 +727,7 @@ components:
                     - '1'
                     - '8'
 
-    ponsoredBrandAuctionResult:
+    SponsoredBrandAuctionResult:
       type: object
       properties:
         winners:
